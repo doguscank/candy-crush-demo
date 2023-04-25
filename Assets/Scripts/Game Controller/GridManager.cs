@@ -84,7 +84,6 @@ public class GridManager : MonoBehaviour
             }
         }
 
-
         if (Input.GetKeyDown(KeyCode.U))
         {
             grid.CheckMatches();

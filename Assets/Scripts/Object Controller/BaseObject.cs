@@ -6,6 +6,7 @@ public class BaseObject : MonoBehaviour
 {
     public bool destroy = false;
     public int dropDepth;
+    public float dropDuration = 2.5f;
 
     public Vector2Int coords;
 
@@ -90,11 +91,28 @@ public class BaseObject : MonoBehaviour
     {
         if (dropDepth > 0)
         {
-            Vector3 newPos = transform.position - new Vector3(0f, dropDepth * 0.4f, 0f);
-            SetPosition(newPos);
-
+            Vector3 endPos = transform.position - new Vector3(0f, dropDepth * 0.4f, 0f);
+            SetPosition(endPos);
+            // StartCoroutine(DropAnimation(dropDepth * 0.4f, dropDuration));
             dropDepth = 0;
         }
+    }
+
+    private IEnumerator DropAnimation(float dropDistance, float duration)
+    {
+        float elapsedTime = 0f;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = transform.position - new Vector3(0f, dropDistance, 0f);
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / duration);
+            yield return null;
+        }
+
+        // Ensure the sprite ends up at the exact end position
+        transform.position = endPos;
     }
 
     public int GetDropDepth()
