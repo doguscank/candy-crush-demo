@@ -5,7 +5,9 @@ using UnityEngine;
 public class BaseObject : MonoBehaviour
 {
     public bool destroy = false;
-    public int dropDepth = 0;
+    public int dropDepth;
+
+    public Vector2Int coords;
 
     public SpriteRenderer spriteRenderer;
     public Color color;
@@ -16,6 +18,7 @@ public class BaseObject : MonoBehaviour
     void Awake()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        dropDepth = 0;
     }
 
     void Start()
@@ -73,6 +76,11 @@ public class BaseObject : MonoBehaviour
         transform.position = pos;
     }
 
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
     public void IncreaseDropDepth(int dropDepth = 1)
     {
         this.dropDepth += dropDepth;
@@ -92,5 +100,20 @@ public class BaseObject : MonoBehaviour
     public int GetDropDepth()
     {
         return dropDepth;
+    }
+
+    public void SetCoords(int newRow, int newCol)
+    {
+        coords = new Vector2Int(newRow, newCol);
+    }
+
+    public void SetCoords(Vector2Int newCoords)
+    {
+        coords = newCoords;
+    }
+
+    public Vector2Int GetCoords()
+    {
+        return coords;
     }
 }

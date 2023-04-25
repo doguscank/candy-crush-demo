@@ -70,6 +70,7 @@ public class Grid
             maxYPos - row * 0.4f,
             0f
         ));
+        script.SetCoords(row, col);
 
         grid[row, col] = newTile;
 
@@ -175,7 +176,7 @@ public class Grid
             for (int j = 0; j < cols; j++)
             {
                 var currentTile = grid[i, j];
-                var obj = grid[i, j].GetComponent<BaseObject>();
+                var obj = currentTile.GetComponent<BaseObject>();
 
                 if (!currentTile.activeSelf)
                 {
@@ -188,6 +189,8 @@ public class Grid
                     continue;
 
                 grid[i + obj.GetDropDepth(), j] = currentTile;
+                obj.SetCoords(i + obj.GetDropDepth(), j);
+
                 grid[i, j] = null;
             }
         }
@@ -215,6 +218,25 @@ public class Grid
                     grid[i, j].GetComponent<BaseObject>().AnimateDrop();
                 }
             }
+        }
+    }
+
+    public void SwitchTiles(int row1, int col1, int row2, int col2)
+    {
+        if ((Mathf.Abs(row1 - row2) == 1 && col1 == col2) || (Mathf.Abs(col1 - col2) == 1 && row1 == row2))
+        {
+            var item1 = grid[row1, col1].GetComponent<BaseObject>();
+            var item2 = grid[row2, col2].GetComponent<BaseObject>();
+
+            var tempCoords = item1.GetCoords();
+            item1.SetCoords(item2.GetCoords());
+            item2.SetCoords(tempCoords);           
+
+            var temp = grid[row1, col1];
+            grid[row1, col1] = grid[row2, col2];
+            grid[row2, col2] = temp;
+
+            Debug.Log($"Switched ({row1},{col1}) with ({row2},{col2})");
         }
     }
 }
