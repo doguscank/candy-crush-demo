@@ -9,12 +9,6 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-./Library/*
-./Temp/*
-./Logs/*
-Library/
-Logs/
-Temp/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -31,6 +25,8 @@ Temp/
 
 # Visual Studio cache directory
 .vs/
+.vscode/
+.vsconfig
 
 # Gradle cache directory
 .gradle/
