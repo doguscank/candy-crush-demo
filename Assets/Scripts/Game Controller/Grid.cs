@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Grid
 {
-    public int rows;
-    public int cols;
+    [SerializeField] private int rows;
+    [SerializeField] private int cols;
     private const int minSequenceLength = 3;
     private const int maxSequenceLength = 5;
 
-    public float minXPos;
-    public float maxYPos;
+    private float minXPos;
+    private float maxYPos;
 
-    public GameObject prefab;
-    public GameObject[,] grid;
+    [SerializeField] private GameObject prefab;
+    [SerializeField] private GameObject[,] grid;
 
     public Grid(int rows, int cols)
     {
@@ -24,6 +24,7 @@ public class Grid
         maxYPos = 0.4f * (int)(rows / 2);
 
         prefab = Resources.Load<GameObject>("Prefabs/Tile");
+        
         grid = new GameObject[rows, cols];
     }
 
@@ -104,6 +105,8 @@ public class Grid
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
+                        if (GameConfig.Debug)
+                            grid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
                         grid[i, j + k].GetComponent<BaseObject>().SetToBeDestroyed();
                     }
                     
@@ -136,6 +139,8 @@ public class Grid
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
+                        if (GameConfig.Debug)
+                            grid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
                         grid[i + k, j].GetComponent<BaseObject>().SetToBeDestroyed();
                     }
                     
@@ -148,7 +153,7 @@ public class Grid
         return hasMatch;
     }
 
-    public void UpdateMatches()
+    public void DestroyMatches()
     {
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)

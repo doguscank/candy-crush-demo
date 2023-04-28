@@ -5,12 +5,14 @@ using UnityEngine;
 public class BaseObject : MonoBehaviour
 {
     public bool destroy = false;
+    public bool isSelected = false;
     public int dropDepth;
     public float dropDuration = 2.5f;
 
     public Vector2Int coords;
 
     public SpriteRenderer spriteRenderer;
+    public GameObject highlight;
     public Color color;
 
     public Vector3 startPos;
@@ -19,6 +21,7 @@ public class BaseObject : MonoBehaviour
     void Awake()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        highlight = gameObject.transform.GetChild(0).gameObject;
         dropDepth = 0;
     }
 
@@ -77,6 +80,11 @@ public class BaseObject : MonoBehaviour
         transform.position = pos;
     }
 
+    public void SetPosition(Vector2Int pos)
+    {
+        SetPosition(new Vector3(pos.x, pos.y, 0f));
+    }
+
     public Vector3 GetPosition()
     {
         return transform.position;
@@ -122,7 +130,7 @@ public class BaseObject : MonoBehaviour
 
     public void SetCoords(int newRow, int newCol)
     {
-        coords = new Vector2Int(newRow, newCol);
+        SetCoords(new Vector2Int(newRow, newCol));
     }
 
     public void SetCoords(Vector2Int newCoords)
@@ -133,5 +141,16 @@ public class BaseObject : MonoBehaviour
     public Vector2Int GetCoords()
     {
         return coords;
+    }
+
+    public void SetSelected(bool selected = true)
+    {
+        isSelected = selected;
+        highlight.SetActive(selected);
+    }
+
+    public bool GetSelected()
+    {
+        return isSelected;
     }
 }

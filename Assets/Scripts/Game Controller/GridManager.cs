@@ -5,7 +5,6 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     public Grid grid;
-
     public int gridRows = 5;
     public int gridCols = 5;
 
@@ -25,7 +24,7 @@ public class GridManager : MonoBehaviour
     {
         while(grid.CheckMatches())
         {
-            grid.UpdateMatches();
+            grid.DestroyMatches();
             grid.UpdateGrid();
             grid.AnimateDrops();
         }
@@ -44,6 +43,7 @@ public class GridManager : MonoBehaviour
                 if (firstSelected == null)
                 {
                     firstSelected = hit.collider.gameObject;
+                    firstSelected.GetComponent<BaseObject>().SetSelected();
                 }
                 else if (secondSelected == null)
                 {
@@ -70,6 +70,8 @@ public class GridManager : MonoBehaviour
                         }
                     }
 
+                    firstSelected.GetComponent<BaseObject>().SetSelected(selected: false);
+
                     firstSelected = null;
                     secondSelected = null;
                 }
@@ -77,7 +79,7 @@ public class GridManager : MonoBehaviour
 
             while (grid.CheckMatches() || validSwitch)
             {
-                grid.UpdateMatches();
+                grid.DestroyMatches();
                 grid.UpdateGrid();
                 grid.AnimateDrops();
                 validSwitch = false;
@@ -87,7 +89,7 @@ public class GridManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.U))
         {
             grid.CheckMatches();
-            grid.UpdateMatches();
+            grid.DestroyMatches();
             grid.UpdateGrid();
             grid.AnimateDrops();
         }
@@ -105,7 +107,7 @@ public class GridManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            grid.UpdateMatches();
+            grid.DestroyMatches();
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
