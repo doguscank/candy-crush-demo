@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BaseObject : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class BaseObject : MonoBehaviour
     public GameObject highlight;
     public Color color;
 
+    public TextMeshPro debugText;
+
     public Vector3 startPos;
     public Vector3 endPos;
 
@@ -23,6 +26,29 @@ public class BaseObject : MonoBehaviour
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         highlight = gameObject.transform.GetChild(0).gameObject;
         dropDepth = 0;
+
+        if (GameConfig.Debug)
+        {
+            // Create a new GameObject to hold the text
+            GameObject textObject = new GameObject("Text");
+            textObject.transform.parent = transform; // Make the textObject a child of this GameObject
+
+            // Add a TextMeshPro component to the textObject
+            TextMeshPro textMesh = textObject.AddComponent<TextMeshPro>();
+            textMesh.text = "1,1"; // Set the text
+
+            debugText = textMesh;
+
+            // Set the font size and alignment of the textMesh
+            textMesh.fontSize = 10; // Set the font size
+            textMesh.alignment = TextAlignmentOptions.Center; // Set the alignment to center
+
+            // Set the position of the textMesh relative to the GameObject's transform
+            textMesh.rectTransform.localPosition = new Vector3(0, 0, 0); // Adjust the position as needed
+
+            // Set local scale to 1
+            textMesh.rectTransform.localScale = new Vector3(1f, 1f, 1f);
+        }
     }
 
     void Start()
@@ -136,6 +162,11 @@ public class BaseObject : MonoBehaviour
     public void SetCoords(Vector2Int newCoords)
     {
         coords = newCoords;
+
+        if (GameConfig.Debug)
+        {
+            debugText.text = $"{newCoords.x},{newCoords.y}";
+        }
     }
 
     public Vector2Int GetCoords()

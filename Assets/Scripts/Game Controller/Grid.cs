@@ -28,6 +28,47 @@ public class Grid
         grid = new GameObject[rows, cols];
     }
 
+    public GameObject[,] GetGrid()
+    {
+        // Create a new array with the same dimensions as the original
+        GameObject[,] copyGrid = new GameObject[rows, cols];
+
+        // Copy each element of the original array to the new array
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                GameObject originalGameObject = grid[i, j];
+                if (originalGameObject != null)
+                {
+                    // Create a new GameObject instance with the same properties as the original
+                    GameObject copyGameObject = GameObject.Instantiate(originalGameObject);
+                    copyGameObject.SetActive(false);
+
+                    // Set the copied GameObject to the copied array
+                    copyGrid[i, j] = copyGameObject;
+                }
+            }
+        }
+
+        return copyGrid;
+    }
+
+    public Color[,] GetColorGrid()
+    {
+        Color[,] colorGrid = new Color[rows, cols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                colorGrid[i, j] = grid[i, j].GetComponent<BaseObject>().GetColor();
+            }
+        }
+
+        return colorGrid;
+    }
+
     public void InitializeGrid()
     {
         for (int i = 0; i < rows; i++)
@@ -199,7 +240,10 @@ public class Grid
                 grid[i, j] = null;
             }
         }
+    }
 
+    public void FillEmptyGrids()
+    {
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
@@ -242,6 +286,17 @@ public class Grid
             grid[row2, col2] = temp;
 
             Debug.Log($"Switched ({row1},{col1}) with ({row2},{col2})");
+        }
+    }
+
+    public void RenderColorGrid(Color[,] colorGrid)
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                grid[i, j].GetComponent<BaseObject>().SetColor(colorGrid[i, j]);
+            }
         }
     }
 }

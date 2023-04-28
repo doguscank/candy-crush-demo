@@ -167,8 +167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72890597a975fa0439d4622355350b9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridRows: 9
-  gridCols: 9
+  gridRows: 5
+  gridCols: 5
   firstSelected: {fileID: 0}
   secondSelected: {fileID: 0}
 --- !u!1 &519420028
@@ -393,7 +393,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 519420031}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 150
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0

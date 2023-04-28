@@ -5,6 +5,7 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     public Grid grid;
+    public GridHistoryManager history;
     public int gridRows = 5;
     public int gridCols = 5;
 
@@ -13,8 +14,12 @@ public class GridManager : MonoBehaviour
 
     void Awake()
     {
+        Random.InitState(42);
+
         grid = new Grid(gridRows, gridCols);
         grid.InitializeGrid();
+
+        history = new GridHistoryManager();
 
         firstSelected = null;
         secondSelected = null;
@@ -26,6 +31,7 @@ public class GridManager : MonoBehaviour
         {
             grid.DestroyMatches();
             grid.UpdateGrid();
+            grid.FillEmptyGrids();
             grid.AnimateDrops();
         }
     }
@@ -77,12 +83,18 @@ public class GridManager : MonoBehaviour
                 }
             }
 
-            while (grid.CheckMatches() || validSwitch)
+            if (true /*!GameConfig.Debug*/)
             {
-                grid.DestroyMatches();
-                grid.UpdateGrid();
-                grid.AnimateDrops();
-                validSwitch = false;
+                while (grid.CheckMatches() || validSwitch)
+                {
+                    history.AddGrid(grid.GetColorGrid());
+                    grid.DestroyMatches();
+                    grid.UpdateGrid();
+                    grid.AnimateDrops();
+                    grid.FillEmptyGrids();
+                    history.AddGrid(grid.GetColorGrid());
+                    validSwitch = false;
+                }
             }
         }
 
@@ -92,6 +104,7 @@ public class GridManager : MonoBehaviour
             grid.DestroyMatches();
             grid.UpdateGrid();
             grid.AnimateDrops();
+            grid.FillEmptyGrids();
         }
 
         if (Input.GetKeyDown(KeyCode.N))
@@ -117,7 +130,24 @@ public class GridManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
+            grid.FillEmptyGrids();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
             grid.AnimateDrops();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            history.DecreaseCursorIndex();
+            grid.RenderColorGrid(history.GetGridAtCursor());
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            history.IncreaseCursorIndex();
+            grid.RenderColorGrid(history.GetGridAtCursor());
         }
     }
 }
