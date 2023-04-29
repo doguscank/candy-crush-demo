@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using TMPro;
 
 public class BaseObject : MonoBehaviour
@@ -92,6 +93,9 @@ public class BaseObject : MonoBehaviour
 
     public void SetColor(Color color)
     {
+        // spriteRenderer.color = Color.white;
+        // spriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(color) - 1, 0, 0));
+        
         spriteRenderer.color = color;
         this.color = color;
     }

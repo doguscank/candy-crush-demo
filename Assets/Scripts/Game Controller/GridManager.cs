@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
         grid = new Grid(gridRows, gridCols);
         grid.InitializeGrid();
 
-        history = new GridHistoryManager();
+        if (GameConfig.Debug) history = new GridHistoryManager();
 
         firstSelected = null;
         secondSelected = null;
@@ -82,72 +82,73 @@ public class GridManager : MonoBehaviour
                     secondSelected = null;
                 }
             }
-
-            if (true /*!GameConfig.Debug*/)
+            
+            while (grid.CheckMatches() || validSwitch)
             {
-                while (grid.CheckMatches() || validSwitch)
-                {
-                    history.AddGrid(grid.GetColorGrid());
-                    grid.DestroyMatches();
-                    grid.UpdateGrid();
-                    grid.AnimateDrops();
-                    grid.FillEmptyGrids();
-                    history.AddGrid(grid.GetColorGrid());
-                    validSwitch = false;
-                }
+                if (GameConfig.Debug) history.AddGrid(grid.GetColorGrid());
+                grid.DestroyMatches();
+                grid.UpdateGrid();
+                grid.AnimateDrops();
+                grid.FillEmptyGrids();
+                if (GameConfig.Debug) history.AddGrid(grid.GetColorGrid());
+                validSwitch = false;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.U))
+        if (GameConfig.Debug)
         {
-            grid.CheckMatches();
-            grid.DestroyMatches();
-            grid.UpdateGrid();
-            grid.AnimateDrops();
-            grid.FillEmptyGrids();
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                grid.CheckMatches();
+                grid.DestroyMatches();
+                grid.UpdateGrid();
+                grid.AnimateDrops();
+                grid.FillEmptyGrids();
+            }
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                grid.ClearGrid();
+                grid.InitializeGrid();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                grid.CheckMatches();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                grid.DestroyMatches();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                grid.UpdateGrid();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                grid.FillEmptyGrids();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                grid.AnimateDrops();
+            }
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                history.DecreaseCursorIndex();
+                grid.RenderColorGrid(history.GetGridAtCursor());
+            }
+
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                history.IncreaseCursorIndex();
+                grid.RenderColorGrid(history.GetGridAtCursor());
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            grid.ClearGrid();
-            grid.InitializeGrid();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            grid.CheckMatches();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            grid.DestroyMatches();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            grid.UpdateGrid();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            grid.FillEmptyGrids();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            grid.AnimateDrops();
-        }
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            history.DecreaseCursorIndex();
-            grid.RenderColorGrid(history.GetGridAtCursor());
-        }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            history.IncreaseCursorIndex();
-            grid.RenderColorGrid(history.GetGridAtCursor());
-        }
     }
 }

@@ -1,9 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TileColors
 {
-    public static Color[] Colors = new Color[]
+    public static List<Color> Colors = new List<Color>
     {
         Color.red,
         Color.green,
@@ -14,7 +15,7 @@ public class TileColors
 
     public static Color GetRandomColor()
     {
-        int index = Random.Range(0, TileColors.Colors.Length);
+        int index = Random.Range(0, TileColors.Colors.Count);
         return TileColors.Colors[index];
     }
 }
