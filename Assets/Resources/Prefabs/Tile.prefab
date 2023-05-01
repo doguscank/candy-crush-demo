@@ -364,7 +364,7 @@ MonoBehaviour:
   destroy: 0
   isSelected: 0
   dropDepth: 0
-  dropDuration: 2.5
+  dropDuration: 1
   coords: {x: 0, y: 0}
   spriteRenderer: {fileID: 0}
   highlight: {fileID: 0}

@@ -221,7 +221,7 @@ public class Grid
     {
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
-                grid[i, j].GetComponent<BaseObject>().DestroyChecked();
+                grid[i, j].GetComponent<BaseObject>().DeactivateChecked();
 
         for (int j = 0; j < cols; j++)
         {
@@ -238,8 +238,10 @@ public class Grid
         }
     }
 
-    public void UpdateGrid()
+    public int UpdateGrid()
     {
+        int removedTiles = 0;
+
         for (int i = rows - 1; i >= 0; i--)
         {
             for (int j = 0; j < cols; j++)
@@ -251,6 +253,7 @@ public class Grid
                 {
                     obj.Destroy();
                     grid[i, j] = null;
+                    removedTiles++;
                     continue;
                 }
 
@@ -263,6 +266,8 @@ public class Grid
                 grid[i, j] = null;
             }
         }
+
+        return removedTiles;
     }
 
     public void FillEmptyGridInitial()

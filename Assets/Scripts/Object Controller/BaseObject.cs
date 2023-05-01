@@ -10,7 +10,7 @@ public class BaseObject : MonoBehaviour
     public bool destroy = false;
     public bool isSelected = false;
     public int dropDepth;
-    public float dropDuration = 1f;
+    public float dropDuration = 0.5f;
 
     public Vector2Int coords;
 
@@ -87,10 +87,12 @@ public class BaseObject : MonoBehaviour
         X_PositionCurve.AddKey(new Keyframe(0f, startPos.x));
         // Create a new keyframe at the duration of the animation with the end position
         X_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.x));
+
         // Create a new keyframe at time 0 with the start position
         Y_PositionCurve.AddKey(new Keyframe(0f, startPos.y));
         // Create a new keyframe at the duration of the animation with the end position
         Y_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.y));
+        
         // Create a new keyframe at time 0 with the start position
         Z_PositionCurve.AddKey(new Keyframe(0f, startPos.z));
         // Create a new keyframe at the duration of the animation with the end position
@@ -101,8 +103,10 @@ public class BaseObject : MonoBehaviour
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
 
+        // Set animation to legacy
         newAnimation.legacy = true;
 
+        // Update clip
         anim.AddClip(newAnimation, "DropAnimation");
         anim.clip = newAnimation;
     }
@@ -112,7 +116,7 @@ public class BaseObject : MonoBehaviour
         destroy = true;
     }
 
-    public bool DestroyChecked()
+    public bool DeactivateChecked()
     {
         if (destroy)
             gameObject.SetActive(false);
@@ -138,10 +142,10 @@ public class BaseObject : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        // spriteRenderer.color = Color.white;
-        // spriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(color) - 1, 0, 0));
+        spriteRenderer.color = Color.white;
+        spriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(color) - 1, 0, 0));
         
-        spriteRenderer.color = color;
+        // spriteRenderer.color = color;
         this.color = color;
     }
 

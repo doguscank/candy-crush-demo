@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class GridManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public Grid grid;
-    public GridHistoryManager history;
+    public GridHistoryManager historyManager;
+    public ScoreManager scoreManager;
     public int gridRows = 5;
     public int gridCols = 5;
 
@@ -14,14 +16,20 @@ public class GridManager : MonoBehaviour
     public GameObject firstSelected;
     public GameObject secondSelected;
 
+    public GameObject scoreObject;
+    public TMP_Text scoreText;
+
     void Awake()
     {
+        scoreText = scoreObject.GetComponent<TMP_Text>();
         Random.InitState(42);
 
         grid = new Grid(gridRows, gridCols);
         grid.InitializeGrid();
 
-        if (GameConfig.Debug) history = new GridHistoryManager();
+        scoreManager = new ScoreManager(scoreText);
+
+        if (GameConfig.Debug) historyManager = new GridHistoryManager();
 
         firstSelected = null;
         secondSelected = null;
@@ -50,56 +58,16 @@ public class GridManager : MonoBehaviour
 
         if (GameConfig.Debug)
         {
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                grid.CheckMatches();
-                grid.DestroyMatches();
-                grid.UpdateGrid();
-                grid.AnimateDrops();
-                grid.FillEmptyGrids();
-            }
-
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                grid.ClearGrid();
-                grid.InitializeGrid();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                grid.CheckMatches();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                grid.DestroyMatches();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                grid.UpdateGrid();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                grid.FillEmptyGrids();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                grid.AnimateDrops();
-            }
-
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                history.DecreaseCursorIndex();
-                grid.RenderColorGrid(history.GetGridAtCursor());
+                historyManager.DecreaseCursorIndex();
+                grid.RenderColorGrid(historyManager.GetGridAtCursor());
             }
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                history.IncreaseCursorIndex();
-                grid.RenderColorGrid(history.GetGridAtCursor());
+                historyManager.IncreaseCursorIndex();
+                grid.RenderColorGrid(historyManager.GetGridAtCursor());
             }
         }
     }
@@ -108,12 +76,13 @@ public class GridManager : MonoBehaviour
     {
         while (grid.CheckMatches())
         {
-            if (GameConfig.Debug) history.AddGrid(grid.GetColorGrid());
+            if (GameConfig.Debug) historyManager.AddGrid(grid.GetColorGrid());
             grid.DestroyMatches();
-            grid.UpdateGrid();
+            int removedTiles = grid.UpdateGrid();
+            scoreManager.IncreaseScore(removedTiles * 10);
             grid.AnimateDrops();
             grid.FillEmptyGrids();
-            if (GameConfig.Debug) history.AddGrid(grid.GetColorGrid());
+            if (GameConfig.Debug) historyManager.AddGrid(grid.GetColorGrid());
             while (grid.CheckAnimations())
             {
                 yield return new WaitForSeconds(0.05f);
