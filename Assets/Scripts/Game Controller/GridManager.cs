@@ -46,7 +46,6 @@ public class GridManager : MonoBehaviour
             updating = true;
             CheckClick();
             StartCoroutine(UpdateGame());
-            updating = false;
         }
 
         if (GameConfig.Debug)
@@ -120,6 +119,8 @@ public class GridManager : MonoBehaviour
                 yield return new WaitForSeconds(0.05f);
             }
         }
+        
+        updating = false;
     }
 
     private void CheckClick()
