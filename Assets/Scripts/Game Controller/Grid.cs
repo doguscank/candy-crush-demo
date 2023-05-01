@@ -256,7 +256,7 @@ public class Grid
         }
     }
 
-    public void AnimateDrops()
+    public void AnimateDrops(bool animation = true)
     {
         for (int i = 0; i < rows; i++)
         {
@@ -264,7 +264,7 @@ public class Grid
             {
                 if (grid[i, j] != null)
                 {
-                    grid[i, j].GetComponent<BaseObject>().AnimateDrop();
+                    grid[i, j].GetComponent<BaseObject>().AnimateDrop(animation: animation);
                 }
             }
         }

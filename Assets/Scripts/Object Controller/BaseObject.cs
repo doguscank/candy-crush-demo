@@ -125,13 +125,17 @@ public class BaseObject : MonoBehaviour
         this.dropDepth += dropDepth;
     }
 
-    public void AnimateDrop()
+    public void AnimateDrop(bool animation = true)
     {
         if (dropDepth > 0)
         {
             Vector3 endPos = transform.position - new Vector3(0f, dropDepth * 0.4f, 0f);
-            SetPosition(endPos);
-            // StartCoroutine(DropAnimation(dropDepth * 0.4f, dropDuration));
+            
+            if (animation)
+                StartCoroutine(DropAnimation(dropDepth * 0.4f, dropDuration));
+            else
+                SetPosition(endPos);
+            
             dropDepth = 0;
         }
     }
@@ -145,12 +149,12 @@ public class BaseObject : MonoBehaviour
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / duration);
+            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / (duration * dropDistance));
             yield return null;
         }
 
         // Ensure the sprite ends up at the exact end position
-        transform.position = endPos;
+        SetPosition(endPos);
     }
 
     public int GetDropDepth()
