@@ -45,7 +45,7 @@ public class GridManager : MonoBehaviour
         {
             updating = true;
             CheckClick();
-            UpdateGame();
+            StartCoroutine(UpdateGame());
             updating = false;
         }
 
@@ -105,7 +105,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void UpdateGame()
+    private IEnumerator UpdateGame()
     {
         while (grid.CheckMatches())
         {
@@ -115,6 +115,10 @@ public class GridManager : MonoBehaviour
             grid.AnimateDrops();
             grid.FillEmptyGrids();
             if (GameConfig.Debug) history.AddGrid(grid.GetColorGrid());
+            while (grid.CheckAnimations())
+            {
+                yield return new WaitForSeconds(0.05f);
+            }
         }
     }
 

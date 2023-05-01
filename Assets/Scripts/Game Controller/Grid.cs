@@ -326,6 +326,21 @@ public class Grid
         }
     }
 
+    public bool CheckAnimations()
+    {
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                if (grid[i, j] != null)
+                    if (grid[i, j].GetComponent<Animation>().isPlaying)
+                        return true;
+            }
+        }
+
+        return false;
+    }
+
     public void SwitchTiles(int row1, int col1, int row2, int col2)
     {
         if ((Mathf.Abs(row1 - row2) == 1 && col1 == col2) || (Mathf.Abs(col1 - col2) == 1 && row1 == row2))
