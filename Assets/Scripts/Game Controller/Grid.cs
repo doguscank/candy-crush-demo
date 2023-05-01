@@ -6,6 +6,7 @@ public class Grid
 {
     [SerializeField] private int rows;
     [SerializeField] private int cols;
+    [SerializeField] private float spacing;
     private const int minSequenceLength = 3;
     private const int maxSequenceLength = 5;
 
@@ -15,13 +16,14 @@ public class Grid
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[,] grid;
 
-    public Grid(int rows, int cols)
+    public Grid(int rows, int cols, float spacing = 0.4f)
     {
         this.rows = rows;
         this.cols = cols;
+        this.spacing = spacing;
 
-        minXPos = -0.4f * (int)(cols / 2);
-        maxYPos = 0.4f * (int)(rows / 2);
+        minXPos = -spacing * (int)(cols / 2);
+        maxYPos = spacing * (int)(rows / 2);
 
         prefab = Resources.Load<GameObject>("Prefabs/Tile");
         
@@ -99,24 +101,45 @@ public class Grid
         grid = new GameObject[rows, cols];
     }
 
-    public bool CreateTileAt(int row, int col)
+    public GameObject CreateTileAt(int row, int col)
     {
         if (row >= rows || row < 0 || col >= cols || col < 0)
-            return false;
+            return null;
 
         GameObject newTile = GameObject.Instantiate(prefab);
         var script = newTile.GetComponent<BaseObject>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
-            minXPos + col * 0.4f,
-            maxYPos - row * 0.4f,
+            minXPos + col * spacing,
+            maxYPos - row * spacing,
             0f
         ));
         script.SetCoords(row, col);
 
         grid[row, col] = newTile;
 
-        return true;
+        return newTile;
+    }
+
+    public GameObject CreateTileAt(int row, int col, int dropDepth)
+    {
+        if (row >= rows || row < 0 || col >= cols || col < 0)
+            return null;
+
+        GameObject newTile = GameObject.Instantiate(prefab);
+        var script = newTile.GetComponent<BaseObject>();
+        script.SetRandomColor();
+        script.SetPosition(new Vector3(
+            minXPos + col * spacing,
+            maxYPos - (row - dropDepth) * spacing,
+            0f
+        ));
+        script.SetCoords(row, col);
+        script.IncreaseDropDepth(dropDepth);
+
+        grid[row, col] = newTile;
+
+        return newTile;
     }
 
     public bool CheckMatches()
@@ -242,7 +265,7 @@ public class Grid
         }
     }
 
-    public void FillEmptyGrids()
+    public void FillEmptyGridInitial()
     {
         for (int i = 0; i < rows; i++)
         {
@@ -253,6 +276,39 @@ public class Grid
                     CreateTileAt(i, j);
                 }
             }
+        }
+    }
+
+    public void FillEmptyGrids()
+    {
+        int[] dropDepths = new int[cols];
+        List<GameObject> createdTiles = new List<GameObject>();
+
+        for (int j = 0; j < cols; j++)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                if (grid[i, j] == null)
+                    dropDepths[j]++;
+                else
+                    break;
+            }
+        }
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                if (grid[i, j] == null)
+                {
+                    createdTiles.Add(CreateTileAt(i, j, dropDepths[j]));
+                }
+            }
+        }
+
+        foreach (var obj in createdTiles)
+        {
+            obj.GetComponent<BaseObject>().AnimateDrop();
         }
     }
 

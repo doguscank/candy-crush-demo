@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEditor;
 using TMPro;
 
 public class BaseObject : MonoBehaviour
@@ -9,7 +10,7 @@ public class BaseObject : MonoBehaviour
     public bool destroy = false;
     public bool isSelected = false;
     public int dropDepth;
-    public float dropDuration = 2.5f;
+    public float dropDuration = 1f;
 
     public Vector2Int coords;
 
@@ -19,12 +20,13 @@ public class BaseObject : MonoBehaviour
 
     public TextMeshPro debugText;
 
-    public Vector3 startPos;
-    public Vector3 endPos;
+    public Animation anim;
+    public AnimationCurve animationCurve;
 
     void Awake()
     {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        anim = gameObject.GetComponent<Animation>();
         highlight = gameObject.transform.GetChild(0).gameObject;
         dropDepth = 0;
 
@@ -60,6 +62,49 @@ public class BaseObject : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void UpdateAnimation()
+    {
+        if (anim.GetClipCount() > 0)
+            anim.RemoveClip("DropAnimation");
+
+        AnimationClip newAnimation = new AnimationClip();
+
+        newAnimation.name = "DropAnimation";
+
+        // Get the current position of the object
+        Vector3 startPos = transform.position;
+
+        // Calculate the end position of the animation
+        Vector3 endPos = startPos - new Vector3(0f, dropDepth * 0.4f, 0f);
+
+        AnimationCurve X_PositionCurve = new AnimationCurve();
+        AnimationCurve Y_PositionCurve = new AnimationCurve();
+        AnimationCurve Z_PositionCurve = new AnimationCurve();
+
+        // Create a new keyframe at time 0 with the start position
+        X_PositionCurve.AddKey(new Keyframe(0f, startPos.x));
+        // Create a new keyframe at the duration of the animation with the end position
+        X_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.x));
+        // Create a new keyframe at time 0 with the start position
+        Y_PositionCurve.AddKey(new Keyframe(0f, startPos.y));
+        // Create a new keyframe at the duration of the animation with the end position
+        Y_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.y));
+        // Create a new keyframe at time 0 with the start position
+        Z_PositionCurve.AddKey(new Keyframe(0f, startPos.z));
+        // Create a new keyframe at the duration of the animation with the end position
+        Z_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.z));
+
+        // Update the animation curve
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
+
+        newAnimation.legacy = true;
+
+        anim.AddClip(newAnimation, "DropAnimation");
+        anim.clip = newAnimation;
     }
 
     public void SetToBeDestroyed()
@@ -132,29 +177,15 @@ public class BaseObject : MonoBehaviour
             Vector3 endPos = transform.position - new Vector3(0f, dropDepth * 0.4f, 0f);
             
             if (animation)
-                StartCoroutine(DropAnimation(dropDepth * 0.4f, dropDuration));
-            else
-                SetPosition(endPos);
+            {
+                UpdateAnimation();
+                anim.Play("DropAnimation");
+            }
+            
+            SetPosition(endPos);
             
             dropDepth = 0;
         }
-    }
-
-    private IEnumerator DropAnimation(float dropDistance, float duration)
-    {
-        float elapsedTime = 0f;
-        Vector3 startPos = transform.position;
-        Vector3 endPos = transform.position - new Vector3(0f, dropDistance, 0f);
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / (duration * dropDistance));
-            yield return null;
-        }
-
-        // Ensure the sprite ends up at the exact end position
-        SetPosition(endPos);
     }
 
     public int GetDropDepth()

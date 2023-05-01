@@ -34,7 +34,7 @@ public class GridManager : MonoBehaviour
         {
             grid.DestroyMatches();
             grid.UpdateGrid();
-            grid.FillEmptyGrids();
+            grid.FillEmptyGridInitial();
             grid.AnimateDrops(animation: false);
         }
     }
