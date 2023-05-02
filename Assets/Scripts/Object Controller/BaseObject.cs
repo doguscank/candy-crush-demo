@@ -10,7 +10,7 @@ public class BaseObject : MonoBehaviour
     public bool destroy = false;
     public bool isSelected = false;
     public int dropDepth;
-    public float dropDuration = 0.5f;
+    private float animationDuration = 0.5f;
 
     public Vector2Int coords;
 
@@ -64,9 +64,9 @@ public class BaseObject : MonoBehaviour
         
     }
 
-    private void UpdateAnimation()
+    private void UpdateDropAnimation()
     {
-        if (anim.GetClipCount() > 0)
+        if (anim.GetClip("DropAnimation"))
             anim.RemoveClip("DropAnimation");
 
         AnimationClip newAnimation = new AnimationClip();
@@ -77,7 +77,7 @@ public class BaseObject : MonoBehaviour
         Vector3 startPos = transform.position;
 
         // Calculate the end position of the animation
-        Vector3 endPos = startPos - new Vector3(0f, dropDepth * 0.4f, 0f);
+        Vector3 endPos = startPos - new Vector3(0f, dropDepth * GameConfig.TileSpacing, 0f);
 
         AnimationCurve X_PositionCurve = new AnimationCurve();
         AnimationCurve Y_PositionCurve = new AnimationCurve();
@@ -86,17 +86,17 @@ public class BaseObject : MonoBehaviour
         // Create a new keyframe at time 0 with the start position
         X_PositionCurve.AddKey(new Keyframe(0f, startPos.x));
         // Create a new keyframe at the duration of the animation with the end position
-        X_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.x));
+        X_PositionCurve.AddKey(new Keyframe(animationDuration, endPos.x));
 
         // Create a new keyframe at time 0 with the start position
         Y_PositionCurve.AddKey(new Keyframe(0f, startPos.y));
         // Create a new keyframe at the duration of the animation with the end position
-        Y_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.y));
+        Y_PositionCurve.AddKey(new Keyframe(animationDuration, endPos.y));
         
         // Create a new keyframe at time 0 with the start position
         Z_PositionCurve.AddKey(new Keyframe(0f, startPos.z));
         // Create a new keyframe at the duration of the animation with the end position
-        Z_PositionCurve.AddKey(new Keyframe(dropDuration, endPos.z));
+        Z_PositionCurve.AddKey(new Keyframe(animationDuration, endPos.z));
 
         // Update the animation curve
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
@@ -108,6 +108,50 @@ public class BaseObject : MonoBehaviour
 
         // Update clip
         anim.AddClip(newAnimation, "DropAnimation");
+        anim.clip = newAnimation;
+    }
+
+    private void UpdateSwapAnimation(Vector3 targetPos)
+    {
+        if (anim.GetClip("SwapAnimation"))
+            anim.RemoveClip("SwapAnimation");
+
+        AnimationClip newAnimation = new AnimationClip();
+
+        newAnimation.name = "SwapAnimation";
+
+        // Get the current position of the object
+        Vector3 startPos = transform.position;
+
+        AnimationCurve X_PositionCurve = new AnimationCurve();
+        AnimationCurve Y_PositionCurve = new AnimationCurve();
+        AnimationCurve Z_PositionCurve = new AnimationCurve();
+
+        // Create a new keyframe at time 0 with the start position
+        X_PositionCurve.AddKey(new Keyframe(0f, startPos.x));
+        // Create a new keyframe at the duration of the animation with the end position
+        X_PositionCurve.AddKey(new Keyframe(animationDuration, targetPos.x));
+
+        // Create a new keyframe at time 0 with the start position
+        Y_PositionCurve.AddKey(new Keyframe(0f, startPos.y));
+        // Create a new keyframe at the duration of the animation with the end position
+        Y_PositionCurve.AddKey(new Keyframe(animationDuration, targetPos.y));
+        
+        // Create a new keyframe at time 0 with the start position
+        Z_PositionCurve.AddKey(new Keyframe(0f, startPos.z));
+        // Create a new keyframe at the duration of the animation with the end position
+        Z_PositionCurve.AddKey(new Keyframe(animationDuration, targetPos.z));
+
+        // Update the animation curve
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
+        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
+
+        // Set animation to legacy
+        newAnimation.legacy = true;
+
+        // Update clip
+        anim.AddClip(newAnimation, "SwapAnimation");
         anim.clip = newAnimation;
     }
 
@@ -178,11 +222,11 @@ public class BaseObject : MonoBehaviour
     {
         if (dropDepth > 0)
         {
-            Vector3 endPos = transform.position - new Vector3(0f, dropDepth * 0.4f, 0f);
+            Vector3 endPos = transform.position - new Vector3(0f, dropDepth * GameConfig.TileSpacing, 0f);
             
             if (animation)
             {
-                UpdateAnimation();
+                UpdateDropAnimation();
                 anim.Play("DropAnimation");
             }
             
@@ -190,6 +234,14 @@ public class BaseObject : MonoBehaviour
             
             dropDepth = 0;
         }
+    }
+
+    public void AnimateSwap(Vector3 targetPosition)
+    {
+        UpdateSwapAnimation(targetPosition);
+        anim.Play("SwapAnimation");
+
+        SetPosition(targetPosition);
     }
 
     public int GetDropDepth()

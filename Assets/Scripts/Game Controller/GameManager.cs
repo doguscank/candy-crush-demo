@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // This step is done because all tiles are spawned randomly
-        while(grid.CheckMatches())
+        while (grid.CheckMatches())
         {
             grid.DestroyMatches();
             grid.UpdateGrid();
@@ -50,11 +50,10 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0) && !updating)
-        {
-            updating = true;
-            CheckClick();
+            StartCoroutine(CheckClick());
+
+        if (!updating)
             StartCoroutine(UpdateGame());
-        }
 
         if (GameConfig.Debug)
         {
@@ -74,6 +73,13 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator UpdateGame()
     {
+        updating = true;
+
+        while (grid.CheckAnimations())
+        {
+            yield return new WaitForSeconds(0.05f);
+        }
+
         while (grid.CheckMatches())
         {
             if (GameConfig.Debug) historyManager.AddGrid(grid.GetColorGrid());
@@ -88,12 +94,14 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(0.05f);
             }
         }
-        
+
         updating = false;
     }
 
-    private void CheckClick()
+    private IEnumerator CheckClick()
     {
+        updating = true;
+
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         // Check if clicked on a tile
         if (hit.collider != null)
@@ -116,15 +124,24 @@ public class GameManager : MonoBehaviour
                     var secondCoords = secondScript.GetCoords();
 
                     grid.SwitchTiles(firstCoords.x, firstCoords.y, secondCoords.x, secondCoords.y);
+
+                    while (grid.CheckAnimations())
+                    {
+                        yield return new WaitForSeconds(0.05f);
+                    }
+
+                    yield return new WaitForSeconds(0.2f);
+
                     bool validSwitch = grid.CheckMatches();
                     if (!validSwitch)
+                    {
                         // Reswitch if not valid
                         grid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
-                    else
-                    {
-                        var tempPos = firstScript.GetPosition();
-                        firstScript.SetPosition(secondScript.GetPosition());
-                        secondScript.SetPosition(tempPos);
+
+                        while (grid.CheckAnimations())
+                        {
+                            yield return new WaitForSeconds(0.05f);
+                        }
                     }
                 }
 
@@ -134,5 +151,7 @@ public class GameManager : MonoBehaviour
                 secondSelected = null;
             }
         }
+
+        updating = false;
     }
 }

@@ -6,7 +6,6 @@ public class Grid
 {
     [SerializeField] private int rows;
     [SerializeField] private int cols;
-    [SerializeField] private float spacing;
     private const int minSequenceLength = 3;
     private const int maxSequenceLength = 5;
 
@@ -16,17 +15,16 @@ public class Grid
     [SerializeField] private GameObject prefab;
     [SerializeField] private GameObject[,] grid;
 
-    public Grid(int rows, int cols, float spacing = 0.4f)
+    public Grid(int rows, int cols)
     {
         this.rows = rows;
         this.cols = cols;
-        this.spacing = spacing;
 
-        minXPos = -spacing * (int)(cols / 2);
-        maxYPos = spacing * (int)(rows / 2);
+        minXPos = -GameConfig.TileSpacing * (int)(cols / 2);
+        maxYPos = GameConfig.TileSpacing * (int)(rows / 2);
 
         prefab = Resources.Load<GameObject>("Prefabs/Tile");
-        
+
         grid = new GameObject[rows, cols];
     }
 
@@ -110,8 +108,8 @@ public class Grid
         var script = newTile.GetComponent<BaseObject>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
-            minXPos + col * spacing,
-            maxYPos - row * spacing,
+            minXPos + col * GameConfig.TileSpacing,
+            maxYPos - row * GameConfig.TileSpacing,
             0f
         ));
         script.SetCoords(row, col);
@@ -130,8 +128,8 @@ public class Grid
         var script = newTile.GetComponent<BaseObject>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
-            minXPos + col * spacing,
-            maxYPos - (row - dropDepth) * spacing,
+            minXPos + col * GameConfig.TileSpacing,
+            maxYPos - (row - dropDepth) * GameConfig.TileSpacing,
             0f
         ));
         script.SetCoords(row, col);
@@ -173,10 +171,10 @@ public class Grid
                             grid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
                         grid[i, j + k].GetComponent<BaseObject>().SetToBeDestroyed();
                     }
-                    
+
                     break;
                 }
-                
+
             }
         }
 
@@ -207,10 +205,10 @@ public class Grid
                             grid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
                         grid[i + k, j].GetComponent<BaseObject>().SetToBeDestroyed();
                     }
-                    
+
                     break;
                 }
-                
+
             }
         }
 
@@ -353,9 +351,15 @@ public class Grid
             var item1 = grid[row1, col1].GetComponent<BaseObject>();
             var item2 = grid[row2, col2].GetComponent<BaseObject>();
 
+            var pos1 = item1.GetPosition();
+            var pos2 = item2.GetPosition();
+
+            item1.AnimateSwap(pos2);
+            item2.AnimateSwap(pos1);
+
             var tempCoords = item1.GetCoords();
             item1.SetCoords(item2.GetCoords());
-            item2.SetCoords(tempCoords);           
+            item2.SetCoords(tempCoords);
 
             var temp = grid[row1, col1];
             grid[row1, col1] = grid[row2, col2];

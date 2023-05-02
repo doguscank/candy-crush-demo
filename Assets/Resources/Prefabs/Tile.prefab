@@ -242,7 +242,7 @@ Transform:
   m_GameObject: {fileID: 6279190126153884230}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5282252672976161098}
@@ -364,7 +364,6 @@ MonoBehaviour:
   destroy: 0
   isSelected: 0
   dropDepth: 0
-  dropDuration: 1
   coords: {x: 0, y: 0}
   spriteRenderer: {fileID: 0}
   highlight: {fileID: 0}
