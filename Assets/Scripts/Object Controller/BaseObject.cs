@@ -43,7 +43,7 @@ public class BaseObject : MonoBehaviour
             debugText = textMesh;
 
             // Set the font size and alignment of the textMesh
-            textMesh.fontSize = 10; // Set the font size
+            textMesh.fontSize = 6; // Set the font size
             textMesh.alignment = TextAlignmentOptions.Center; // Set the alignment to center
 
             // Set the position of the textMesh relative to the GameObject's transform
