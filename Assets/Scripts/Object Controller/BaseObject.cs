@@ -55,15 +55,18 @@ public class BaseObject : MonoBehaviour
 
     private void UpdateDropAnimation()
     {
-        if (mAnimation.GetClip("DropAnimation"))
-            mAnimation.RemoveClip("DropAnimation");
+        AnimationClip animationClip = mAnimation.GetClip("DropAnimation");
 
-        AnimationClip newAnimation = new AnimationClip();
-
-        // Set animation to legacy
-        newAnimation.legacy = true;
-
-        newAnimation.name = "DropAnimation";
+        if (!animationClip)
+        {
+            animationClip = new AnimationClip();
+            // Set animation to legacy
+            animationClip.legacy = true;
+            animationClip.name = "DropAnimation";
+            // Update clip
+            mAnimation.AddClip(animationClip, "DropAnimation");
+            mAnimation.clip = animationClip;
+        }
 
         // Get the current position of the object
         Vector3 startPosition = transform.position;
@@ -91,26 +94,25 @@ public class BaseObject : MonoBehaviour
         Z_PositionCurve.AddKey(new Keyframe(mAnimationDuration, endPosition.z));
 
         // Update the animation curve
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
-
-        // Update clip
-        mAnimation.AddClip(newAnimation, "DropAnimation");
-        mAnimation.clip = newAnimation;
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
     }
 
     private void UpdateSwapAnimation(Vector3 targetPos)
     {
-        if (mAnimation.GetClip("SwapAnimation"))
-            mAnimation.RemoveClip("SwapAnimation");
+        AnimationClip animationClip = mAnimation.GetClip("SwapAnimation");
 
-        AnimationClip newAnimation = new AnimationClip();
-
-        // Set animation to legacy
-        newAnimation.legacy = true;
-
-        newAnimation.name = "SwapAnimation";
+        if (!animationClip)
+        {
+            animationClip = new AnimationClip();
+            // Set animation to legacy
+            animationClip.legacy = true;
+            animationClip.name = "SwapAnimation";
+            // Update clip
+            mAnimation.AddClip(animationClip, "SwapAnimation");
+            mAnimation.clip = animationClip;
+        }
 
         // Get the current position of the object
         Vector3 startPosition = transform.position;
@@ -135,13 +137,9 @@ public class BaseObject : MonoBehaviour
         Z_PositionCurve.AddKey(new Keyframe(mAnimationDuration, targetPos.z));
 
         // Update the animation curve
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
-        newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
-
-        // Update clip
-        mAnimation.AddClip(newAnimation, "SwapAnimation");
-        mAnimation.clip = newAnimation;
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
+        animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
     }
 
     public void SetMarked()
@@ -176,7 +174,7 @@ public class BaseObject : MonoBehaviour
     public void SetColor(Color color)
     {
         mSpriteRenderer.color = Color.white;
-        mSpriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(mColor) - 1, 0, 0));
+        mSpriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(color) - 1, 0, 0));
         
         mColor = color;
     }
