@@ -10,7 +10,6 @@ public class BaseObject : MonoBehaviour
     private bool mIsMarked = false;
     private bool mIsSelected = false;
     private int mDropDepth;
-    private float mAnimationDuration = 0.5f;
 
     private Vector2Int mCoords;
 
@@ -81,17 +80,17 @@ public class BaseObject : MonoBehaviour
         // Create a new keyframe at time 0 with the start position
         X_PositionCurve.AddKey(new Keyframe(0f, startPosition.x));
         // Create a new keyframe at the duration of the animation with the end position
-        X_PositionCurve.AddKey(new Keyframe(mAnimationDuration, endPosition.x));
+        X_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, endPosition.x));
 
         // Create a new keyframe at time 0 with the start position
         Y_PositionCurve.AddKey(new Keyframe(0f, startPosition.y));
         // Create a new keyframe at the duration of the animation with the end position
-        Y_PositionCurve.AddKey(new Keyframe(mAnimationDuration, endPosition.y));
+        Y_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, endPosition.y));
         
         // Create a new keyframe at time 0 with the start position
         Z_PositionCurve.AddKey(new Keyframe(0f, startPosition.z));
         // Create a new keyframe at the duration of the animation with the end position
-        Z_PositionCurve.AddKey(new Keyframe(mAnimationDuration, endPosition.z));
+        Z_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, endPosition.z));
 
         // Update the animation curve
         animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
@@ -124,17 +123,17 @@ public class BaseObject : MonoBehaviour
         // Create a new keyframe at time 0 with the start position
         X_PositionCurve.AddKey(new Keyframe(0f, startPosition.x));
         // Create a new keyframe at the duration of the animation with the end position
-        X_PositionCurve.AddKey(new Keyframe(mAnimationDuration, targetPos.x));
+        X_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, targetPos.x));
 
         // Create a new keyframe at time 0 with the start position
         Y_PositionCurve.AddKey(new Keyframe(0f, startPosition.y));
         // Create a new keyframe at the duration of the animation with the end position
-        Y_PositionCurve.AddKey(new Keyframe(mAnimationDuration, targetPos.y));
+        Y_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, targetPos.y));
         
         // Create a new keyframe at time 0 with the start position
         Z_PositionCurve.AddKey(new Keyframe(0f, startPosition.z));
         // Create a new keyframe at the duration of the animation with the end position
-        Z_PositionCurve.AddKey(new Keyframe(mAnimationDuration, targetPos.z));
+        Z_PositionCurve.AddKey(new Keyframe(GameConfig.AnimationDuration, targetPos.z));
 
         // Update the animation curve
         animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
