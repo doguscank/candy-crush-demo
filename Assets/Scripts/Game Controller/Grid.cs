@@ -82,27 +82,7 @@ public class Grid
         }
     }
 
-    public GameObject CreateTileAt(int row, int col)
-    {
-        if (row >= GameConfig.Rows || row < 0 || col >= GameConfig.Cols || col < 0)
-            return null;
-
-        GameObject newTile = GameObject.Instantiate(mPrefab);
-        var script = newTile.GetComponent<BaseObject>();
-        script.SetRandomColor();
-        script.SetPosition(new Vector3(
-            minXPos + col * GameConfig.TileSpacing,
-            maxYPos - row * GameConfig.TileSpacing,
-            0f
-        ));
-        script.SetCoords(row, col);
-
-        mGrid[row, col] = newTile;
-
-        return newTile;
-    }
-
-    public GameObject CreateTileAt(int row, int col, int dropDepth)
+    public GameObject CreateTileAt(int row, int col, int dropDepth = 0)
     {
         if (row >= GameConfig.Rows || row < 0 || col >= GameConfig.Cols || col < 0)
             return null;
