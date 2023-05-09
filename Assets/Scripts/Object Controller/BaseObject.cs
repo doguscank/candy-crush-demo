@@ -71,6 +71,9 @@ public class BaseObject : MonoBehaviour
 
         AnimationClip newAnimation = new AnimationClip();
 
+        // Set animation to legacy
+        newAnimation.legacy = true;
+
         newAnimation.name = "DropAnimation";
 
         // Get the current position of the object
@@ -103,9 +106,6 @@ public class BaseObject : MonoBehaviour
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
 
-        // Set animation to legacy
-        newAnimation.legacy = true;
-
         // Update clip
         anim.AddClip(newAnimation, "DropAnimation");
         anim.clip = newAnimation;
@@ -117,6 +117,9 @@ public class BaseObject : MonoBehaviour
             anim.RemoveClip("SwapAnimation");
 
         AnimationClip newAnimation = new AnimationClip();
+
+        // Set animation to legacy
+        newAnimation.legacy = true;
 
         newAnimation.name = "SwapAnimation";
 
@@ -146,9 +149,6 @@ public class BaseObject : MonoBehaviour
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.x", X_PositionCurve);
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.y", Y_PositionCurve);
         newAnimation.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
-
-        // Set animation to legacy
-        newAnimation.legacy = true;
 
         // Update clip
         anim.AddClip(newAnimation, "SwapAnimation");
