@@ -10,7 +10,6 @@ public class TileColors
         Color.green,
         Color.yellow,
         Color.cyan,
-        // Color.black
     };
 
     public static Color GetRandomColor()

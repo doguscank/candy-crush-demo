@@ -5,25 +5,24 @@ using TMPro;
 
 public class ScoreManager
 {
-    public int score;
-
-    public TMP_Text scoreText;
+    private int mScore;
+    private TMP_Text mScoreText;
 
     public ScoreManager(TMP_Text scoreText)
     {
-        score = 0;
-        this.scoreText = scoreText;
+        mScore = 0;
+        mScoreText = scoreText;
     }
 
     public void IncreaseScore(int value)
     {
-        score += value;
+        mScore += value;
 
         RenderScore();
     }
 
     public void RenderScore()
     {
-        scoreText.text = string.Format("Score: {0:000 000 000}", score);
+        mScoreText.text = string.Format("Score: {0:000 000 000}", mScore);
     }
 }

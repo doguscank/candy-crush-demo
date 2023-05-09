@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class GridHistoryManager
 {
-    public LinkedList<Color[,]> history = new LinkedList<Color[,]>();
-    public int cursorIndex = 0;
+    private LinkedList<Color[,]> mHistory = new LinkedList<Color[,]>();
+    private int mCursorIndex = 0;
 
     public GridHistoryManager()
     {
@@ -14,28 +14,28 @@ public class GridHistoryManager
 
     public void AddGrid(Color[,] newGrid)
     {
-        if (history.Count > GameConfig.HistorySize)
-            history.RemoveFirst();
-        
-        history.AddLast(newGrid);
-        cursorIndex = history.Count - 1;
+        if (mHistory.Count > GameConfig.HistorySize)
+            mHistory.RemoveFirst();
+
+        mHistory.AddLast(newGrid);
+        mCursorIndex = mHistory.Count - 1;
     }
 
     public Color[,] GetLastGrid()
     {
-        return history.Last.Value;
+        return mHistory.Last.Value;
     }
 
     public void RemoveLast()
     {
-        history.RemoveLast();
+        mHistory.RemoveLast();
     }
 
     public Color[,] GetGridAtCursor()
     {
-        var cursor = history.First;
+        var cursor = mHistory.First;
 
-        for (int i=0; i<cursorIndex; i++)
+        for (int i = 0; i < mCursorIndex; i++)
         {
             cursor = cursor.Next;
         }
@@ -45,18 +45,18 @@ public class GridHistoryManager
 
     public void IncreaseCursorIndex()
     {
-        if (cursorIndex < history.Count - 1)
-            cursorIndex++;
+        if (mCursorIndex < mHistory.Count - 1)
+            mCursorIndex++;
     }
 
     public void DecreaseCursorIndex()
     {
-        if (cursorIndex > 0)
-            cursorIndex--;
+        if (mCursorIndex > 0)
+            mCursorIndex--;
     }
 
     public int GetCursorIndex()
     {
-        return cursorIndex;
+        return mCursorIndex;
     }
 }

@@ -5,45 +5,43 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public Grid grid;
-    public GridHistoryManager historyManager;
-    public ScoreManager scoreManager;
-    public int gridRows = 5;
-    public int gridCols = 5;
+    private Grid mGrid;
+    private GridHistoryManager mHistoryManager;
+    private ScoreManager mScoreManager;
 
-    public bool isUpdating = false;
+    private bool isUpdating = false;
 
-    public GameObject firstSelected;
-    public GameObject secondSelected;
+    private GameObject mFirstSelected;
+    private GameObject mSecondSelected;
 
-    public GameObject scoreObject;
-    public TMP_Text scoreText;
+    public GameObject mScoreObject;
+    public TMP_Text mScoreText;
 
     void Awake()
     {
-        scoreText = scoreObject.GetComponent<TMP_Text>();
+        mScoreText = mScoreObject.GetComponent<TMP_Text>();
         Random.InitState(42);
 
-        grid = new Grid(gridRows, gridCols);
-        grid.InitializeGrid();
+        mGrid = new Grid();
+        mGrid.InitializeGrid();
 
-        scoreManager = new ScoreManager(scoreText);
+        mScoreManager = new ScoreManager(mScoreText);
 
-        if (GameConfig.IsDebug) historyManager = new GridHistoryManager();
+        if (GameConfig.IsDebug) mHistoryManager = new GridHistoryManager();
 
-        firstSelected = null;
-        secondSelected = null;
+        mFirstSelected = null;
+        mSecondSelected = null;
     }
 
     void Start()
     {
         // This step is done because all tiles are spawned randomly
-        while (grid.CheckMatches())
+        while (mGrid.CheckMatches())
         {
-            grid.DestroyMatches();
-            grid.UpdateGrid();
-            grid.FillEmptyGridInitial();
-            grid.AnimateDrops(animation: false);
+            mGrid.DestroyMatches();
+            mGrid.UpdateGrid();
+            mGrid.FillEmptyGridInitial();
+            mGrid.AnimateDrops(animation: false);
         }
     }
 
@@ -59,14 +57,14 @@ public class GameManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                historyManager.DecreaseCursorIndex();
-                grid.RenderColorGrid(historyManager.GetGridAtCursor());
+                mHistoryManager.DecreaseCursorIndex();
+                mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
             }
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                historyManager.IncreaseCursorIndex();
-                grid.RenderColorGrid(historyManager.GetGridAtCursor());
+                mHistoryManager.IncreaseCursorIndex();
+                mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
             }
 
             if (Input.GetKeyDown(KeyCode.U))
@@ -80,21 +78,21 @@ public class GameManager : MonoBehaviour
     {
         isUpdating = true;
 
-        while (grid.CheckAnimations())
+        while (mGrid.CheckAnimations())
         {
             yield return new WaitForSeconds(0.05f);
         }
 
-        while (grid.CheckMatches())
+        while (mGrid.CheckMatches())
         {
-            if (GameConfig.IsDebug) historyManager.AddGrid(grid.GetColorGrid());
-            grid.DestroyMatches();
-            int removedTiles = grid.UpdateGrid();
-            scoreManager.IncreaseScore(removedTiles * 10);
-            grid.AnimateDrops();
-            grid.FillEmptyGrids();
-            if (GameConfig.IsDebug) historyManager.AddGrid(grid.GetColorGrid());
-            while (grid.CheckAnimations())
+            if (GameConfig.IsDebug) mHistoryManager.AddGrid(mGrid.GetColorGrid());
+            mGrid.DestroyMatches();
+            int removedTiles = mGrid.UpdateGrid();
+            mScoreManager.IncreaseScore(removedTiles * 10);
+            mGrid.AnimateDrops();
+            mGrid.FillEmptyGrids();
+            if (GameConfig.IsDebug) mHistoryManager.AddGrid(mGrid.GetColorGrid());
+            while (mGrid.CheckAnimations())
             {
                 yield return new WaitForSeconds(0.05f);
             }
@@ -111,49 +109,49 @@ public class GameManager : MonoBehaviour
         // Check if clicked on a tile
         if (hit.collider != null)
         {
-            if (firstSelected == null)
+            if (mFirstSelected == null)
             {
-                firstSelected = hit.collider.gameObject;
-                firstSelected.GetComponent<BaseObject>().SetSelected();
+                mFirstSelected = hit.collider.gameObject;
+                mFirstSelected.GetComponent<BaseObject>().SetSelected();
             }
-            else if (secondSelected == null)
+            else if (mSecondSelected == null)
             {
-                if (hit.collider.gameObject != firstSelected)
+                if (hit.collider.gameObject != mFirstSelected)
                 {
-                    secondSelected = hit.collider.gameObject;
+                    mSecondSelected = hit.collider.gameObject;
 
-                    var firstScript = firstSelected.GetComponent<BaseObject>();
-                    var secondScript = secondSelected.GetComponent<BaseObject>();
+                    var firstScript = mFirstSelected.GetComponent<BaseObject>();
+                    var secondScript = mSecondSelected.GetComponent<BaseObject>();
 
                     var firstCoords = firstScript.GetCoords();
                     var secondCoords = secondScript.GetCoords();
 
-                    grid.SwitchTiles(firstCoords.x, firstCoords.y, secondCoords.x, secondCoords.y);
+                    mGrid.SwitchTiles(firstCoords.x, firstCoords.y, secondCoords.x, secondCoords.y);
 
-                    while (grid.CheckAnimations())
+                    while (mGrid.CheckAnimations())
                     {
                         yield return new WaitForSeconds(0.05f);
                     }
 
                     yield return new WaitForSeconds(0.2f);
 
-                    bool validSwitch = grid.CheckMatches();
+                    bool validSwitch = mGrid.CheckMatches();
                     if (!validSwitch)
                     {
                         // Reswitch if not valid
-                        grid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
+                        mGrid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
 
-                        while (grid.CheckAnimations())
+                        while (mGrid.CheckAnimations())
                         {
                             yield return new WaitForSeconds(0.05f);
                         }
                     }
                 }
 
-                firstSelected.GetComponent<BaseObject>().SetSelected(selected: false);
+                mFirstSelected.GetComponent<BaseObject>().SetSelected(selected: false);
 
-                firstSelected = null;
-                secondSelected = null;
+                mFirstSelected = null;
+                mSecondSelected = null;
             }
         }
 

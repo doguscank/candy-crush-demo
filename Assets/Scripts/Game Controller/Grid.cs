@@ -1,44 +1,35 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid
 {
-    [SerializeField] private int rows;
-    [SerializeField] private int cols;
-    private const int minSequenceLength = 3;
-    private const int maxSequenceLength = 5;
-
     private float minXPos;
     private float maxYPos;
 
-    [SerializeField] private GameObject prefab;
-    [SerializeField] private GameObject[,] grid;
+    [SerializeField] private GameObject mPrefab;
+    [SerializeField] private GameObject[,] mGrid;
 
-    public Grid(int rows, int cols)
+    public Grid()
     {
-        this.rows = rows;
-        this.cols = cols;
+        minXPos = -GameConfig.TileSpacing * (int)(GameConfig.Cols / 2);
+        maxYPos = GameConfig.TileSpacing * (int)(GameConfig.Rows / 2);
 
-        minXPos = -GameConfig.TileSpacing * (int)(cols / 2);
-        maxYPos = GameConfig.TileSpacing * (int)(rows / 2);
+        mPrefab = Resources.Load<GameObject>("Prefabs/Tile");
 
-        prefab = Resources.Load<GameObject>("Prefabs/Tile");
-
-        grid = new GameObject[rows, cols];
+        mGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
     }
 
     public GameObject[,] GetGrid()
     {
         // Create a new array with the same dimensions as the original
-        GameObject[,] copyGrid = new GameObject[rows, cols];
+        GameObject[,] copyGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
 
         // Copy each element of the original array to the new array
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                GameObject originalGameObject = grid[i, j];
+                GameObject originalGameObject = mGrid[i, j];
                 if (originalGameObject != null)
                 {
                     // Create a new GameObject instance with the same properties as the original
@@ -56,13 +47,13 @@ public class Grid
 
     public Color[,] GetColorGrid()
     {
-        Color[,] colorGrid = new Color[rows, cols];
+        Color[,] colorGrid = new Color[GameConfig.Rows, GameConfig.Cols];
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                colorGrid[i, j] = grid[i, j].GetComponent<BaseObject>().GetColor();
+                colorGrid[i, j] = mGrid[i, j].GetComponent<BaseObject>().GetColor();
             }
         }
 
@@ -71,9 +62,9 @@ public class Grid
 
     public void InitializeGrid()
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
                 CreateTileAt(i, j);
             }
@@ -82,29 +73,21 @@ public class Grid
 
     public void ClearGrid()
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                grid[i, j].GetComponent<BaseObject>().DestroyImmediate();
+                mGrid[i, j].GetComponent<BaseObject>().DestroyImmediate();
             }
         }
     }
 
-    public void SetGridSize(int rows, int cols)
-    {
-        this.rows = rows;
-        this.cols = cols;
-
-        grid = new GameObject[rows, cols];
-    }
-
     public GameObject CreateTileAt(int row, int col)
     {
-        if (row >= rows || row < 0 || col >= cols || col < 0)
+        if (row >= GameConfig.Rows || row < 0 || col >= GameConfig.Cols || col < 0)
             return null;
 
-        GameObject newTile = GameObject.Instantiate(prefab);
+        GameObject newTile = GameObject.Instantiate(mPrefab);
         var script = newTile.GetComponent<BaseObject>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
@@ -114,17 +97,17 @@ public class Grid
         ));
         script.SetCoords(row, col);
 
-        grid[row, col] = newTile;
+        mGrid[row, col] = newTile;
 
         return newTile;
     }
 
     public GameObject CreateTileAt(int row, int col, int dropDepth)
     {
-        if (row >= rows || row < 0 || col >= cols || col < 0)
+        if (row >= GameConfig.Rows || row < 0 || col >= GameConfig.Cols || col < 0)
             return null;
 
-        GameObject newTile = GameObject.Instantiate(prefab);
+        GameObject newTile = GameObject.Instantiate(mPrefab);
         var script = newTile.GetComponent<BaseObject>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
@@ -135,7 +118,7 @@ public class Grid
         script.SetCoords(row, col);
         script.IncreaseDropDepth(dropDepth);
 
-        grid[row, col] = newTile;
+        mGrid[row, col] = newTile;
 
         return newTile;
     }
@@ -144,17 +127,17 @@ public class Grid
     {
         bool hasMatch = false;
 
-        // Check grid for horizontal matches
-        for (int i = 0; i < rows; i++)
+        // Check mGrid for horizontal matches
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols - minSequenceLength + 1; j++)
+            for (int j = 0; j < GameConfig.Cols - GameConfig.MinSequenceLength + 1; j++)
             {
-                Color currentItemColor = grid[i, j].GetComponent<BaseObject>().GetColor();
+                Color currentItemColor = mGrid[i, j].GetComponent<BaseObject>().GetColor();
                 int currentSequenceLength = 1;
 
-                for (int k = j + 1; k < Mathf.Min(j + maxSequenceLength, cols); k++)
+                for (int k = j + 1; k < Mathf.Min(j + GameConfig.MaxSequenceLength, GameConfig.Cols); k++)
                 {
-                    if (grid[i, k].GetComponent<BaseObject>().GetColor() == currentItemColor)
+                    if (mGrid[i, k].GetComponent<BaseObject>().GetColor() == currentItemColor)
                     {
                         currentSequenceLength++;
                     }
@@ -162,14 +145,14 @@ public class Grid
                         break;
                 }
 
-                if (currentSequenceLength >= minSequenceLength)
+                if (currentSequenceLength >= GameConfig.MinSequenceLength)
                 {
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
                         if (GameConfig.IsDebug)
-                            grid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
-                        grid[i, j + k].GetComponent<BaseObject>().SetToBeDestroyed();
+                            mGrid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
+                        mGrid[i, j + k].GetComponent<BaseObject>().SetMarked();
                     }
 
                     break;
@@ -178,17 +161,17 @@ public class Grid
             }
         }
 
-        // Check grid for vertical matches
-        for (int j = 0; j < cols; j++)
+        // Check mGrid for vertical matches
+        for (int j = 0; j < GameConfig.Cols; j++)
         {
-            for (int i = 0; i < rows - minSequenceLength + 1; i++)
+            for (int i = 0; i < GameConfig.Rows - GameConfig.MinSequenceLength + 1; i++)
             {
-                Color currentItemColor = grid[i, j].GetComponent<BaseObject>().GetColor();
+                Color currentItemColor = mGrid[i, j].GetComponent<BaseObject>().GetColor();
                 int currentSequenceLength = 1;
 
-                for (int k = i + 1; k < Mathf.Min(i + maxSequenceLength, rows); k++)
+                for (int k = i + 1; k < Mathf.Min(i + GameConfig.MaxSequenceLength, GameConfig.Rows); k++)
                 {
-                    if (grid[k, j].GetComponent<BaseObject>().GetColor() == currentItemColor)
+                    if (mGrid[k, j].GetComponent<BaseObject>().GetColor() == currentItemColor)
                     {
                         currentSequenceLength++;
                     }
@@ -196,14 +179,14 @@ public class Grid
                         break;
                 }
 
-                if (currentSequenceLength >= minSequenceLength)
+                if (currentSequenceLength >= GameConfig.MinSequenceLength)
                 {
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
                         if (GameConfig.IsDebug)
-                            grid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
-                        grid[i + k, j].GetComponent<BaseObject>().SetToBeDestroyed();
+                            mGrid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
+                        mGrid[i + k, j].GetComponent<BaseObject>().SetMarked();
                     }
 
                     break;
@@ -217,19 +200,19 @@ public class Grid
 
     public void DestroyMatches()
     {
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                grid[i, j].GetComponent<BaseObject>().DeactivateChecked();
+        for (int i = 0; i < GameConfig.Rows; i++)
+            for (int j = 0; j < GameConfig.Cols; j++)
+                mGrid[i, j].GetComponent<BaseObject>().DeactivateMarked();
 
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < GameConfig.Cols; j++)
         {
-            for (int i = rows - 1; i >= 0; i--)
+            for (int i = GameConfig.Rows - 1; i >= 0; i--)
             {
-                if (!grid[i, j].activeSelf)
+                if (!mGrid[i, j].activeSelf)
                 {
                     for (int k = i - 1; k >= 0; k--)
                     {
-                        grid[k, j].GetComponent<BaseObject>().IncreaseDropDepth();
+                        mGrid[k, j].GetComponent<BaseObject>().IncreaseDropDepth();
                     }
                 }
             }
@@ -240,17 +223,17 @@ public class Grid
     {
         int removedTiles = 0;
 
-        for (int i = rows - 1; i >= 0; i--)
+        for (int i = GameConfig.Rows - 1; i >= 0; i--)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                var currentTile = grid[i, j];
+                var currentTile = mGrid[i, j];
                 var obj = currentTile.GetComponent<BaseObject>();
 
                 if (!currentTile.activeSelf)
                 {
                     obj.Destroy();
-                    grid[i, j] = null;
+                    mGrid[i, j] = null;
                     removedTiles++;
                     continue;
                 }
@@ -258,10 +241,10 @@ public class Grid
                 if (obj.GetDropDepth() < 1)
                     continue;
 
-                grid[i + obj.GetDropDepth(), j] = currentTile;
+                mGrid[i + obj.GetDropDepth(), j] = currentTile;
                 obj.SetCoords(i + obj.GetDropDepth(), j);
 
-                grid[i, j] = null;
+                mGrid[i, j] = null;
             }
         }
 
@@ -270,11 +253,11 @@ public class Grid
 
     public void FillEmptyGridInitial()
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                if (grid[i, j] == null)
+                if (mGrid[i, j] == null)
                 {
                     CreateTileAt(i, j);
                 }
@@ -284,25 +267,25 @@ public class Grid
 
     public void FillEmptyGrids()
     {
-        int[] dropDepths = new int[cols];
+        int[] dropDepths = new int[GameConfig.Cols];
         List<GameObject> createdTiles = new List<GameObject>();
 
-        for (int j = 0; j < cols; j++)
+        for (int j = 0; j < GameConfig.Cols; j++)
         {
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < GameConfig.Rows; i++)
             {
-                if (grid[i, j] == null)
+                if (mGrid[i, j] == null)
                     dropDepths[j]++;
                 else
                     break;
             }
         }
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                if (grid[i, j] == null)
+                if (mGrid[i, j] == null)
                 {
                     createdTiles.Add(CreateTileAt(i, j, dropDepths[j]));
                 }
@@ -317,13 +300,13 @@ public class Grid
 
     public void AnimateDrops(bool animation = true)
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                if (grid[i, j] != null)
+                if (mGrid[i, j] != null)
                 {
-                    grid[i, j].GetComponent<BaseObject>().AnimateDrop(animation: animation);
+                    mGrid[i, j].GetComponent<BaseObject>().AnimateDrop(animation: animation);
                 }
             }
         }
@@ -331,12 +314,12 @@ public class Grid
 
     public bool CheckAnimations()
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                if (grid[i, j] != null)
-                    if (grid[i, j].GetComponent<Animation>().isPlaying)
+                if (mGrid[i, j] != null)
+                    if (mGrid[i, j].GetComponent<Animation>().isPlaying)
                         return true;
             }
         }
@@ -348,8 +331,8 @@ public class Grid
     {
         if ((Mathf.Abs(row1 - row2) == 1 && col1 == col2) || (Mathf.Abs(col1 - col2) == 1 && row1 == row2))
         {
-            var item1 = grid[row1, col1].GetComponent<BaseObject>();
-            var item2 = grid[row2, col2].GetComponent<BaseObject>();
+            var item1 = mGrid[row1, col1].GetComponent<BaseObject>();
+            var item2 = mGrid[row2, col2].GetComponent<BaseObject>();
 
             var pos1 = item1.GetPosition();
             var pos2 = item2.GetPosition();
@@ -361,9 +344,9 @@ public class Grid
             item1.SetCoords(item2.GetCoords());
             item2.SetCoords(tempCoords);
 
-            var temp = grid[row1, col1];
-            grid[row1, col1] = grid[row2, col2];
-            grid[row2, col2] = temp;
+            var temp = mGrid[row1, col1];
+            mGrid[row1, col1] = mGrid[row2, col2];
+            mGrid[row2, col2] = temp;
 
             Debug.Log($"Switched ({row1},{col1}) with ({row2},{col2})");
         }
@@ -371,11 +354,11 @@ public class Grid
 
     public void RenderColorGrid(Color[,] colorGrid)
     {
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                grid[i, j].GetComponent<BaseObject>().SetColor(colorGrid[i, j]);
+                mGrid[i, j].GetComponent<BaseObject>().SetColor(colorGrid[i, j]);
             }
         }
     }
