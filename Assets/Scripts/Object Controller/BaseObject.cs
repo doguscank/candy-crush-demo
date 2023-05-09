@@ -30,7 +30,7 @@ public class BaseObject : MonoBehaviour
         highlight = gameObject.transform.GetChild(0).gameObject;
         dropDepth = 0;
 
-        if (GameConfig.Debug)
+        if (GameConfig.IsDebug)
         {
             // Create a new GameObject to hold the text
             GameObject textObject = new GameObject("Text");
@@ -258,7 +258,7 @@ public class BaseObject : MonoBehaviour
     {
         coords = newCoords;
 
-        if (GameConfig.Debug)
+        if (GameConfig.IsDebug)
         {
             debugText.text = $"{newCoords.x},{newCoords.y}";
         }

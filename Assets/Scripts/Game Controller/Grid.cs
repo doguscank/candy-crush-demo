@@ -167,7 +167,7 @@ public class Grid
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
-                        if (GameConfig.Debug)
+                        if (GameConfig.IsDebug)
                             grid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
                         grid[i, j + k].GetComponent<BaseObject>().SetToBeDestroyed();
                     }
@@ -201,7 +201,7 @@ public class Grid
                     for (int k = 0; k < currentSequenceLength; k++)
                     {
                         hasMatch = true;
-                        if (GameConfig.Debug)
+                        if (GameConfig.IsDebug)
                             grid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
                         grid[i + k, j].GetComponent<BaseObject>().SetToBeDestroyed();
                     }

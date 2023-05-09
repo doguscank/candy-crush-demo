@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public int gridRows = 5;
     public int gridCols = 5;
 
-    public bool updating = false;
+    public bool isUpdating = false;
 
     public GameObject firstSelected;
     public GameObject secondSelected;
@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
 
         scoreManager = new ScoreManager(scoreText);
 
-        if (GameConfig.Debug) historyManager = new GridHistoryManager();
+        if (GameConfig.IsDebug) historyManager = new GridHistoryManager();
 
         firstSelected = null;
         secondSelected = null;
@@ -49,13 +49,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !updating)
+        if (Input.GetMouseButtonDown(0) && !isUpdating)
             StartCoroutine(CheckClick());
 
-        if (!updating)
+        if (!isUpdating && !GameConfig.IsDebug)
             StartCoroutine(UpdateGame());
 
-        if (GameConfig.Debug)
+        if (GameConfig.IsDebug)
         {
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
@@ -68,12 +68,17 @@ public class GameManager : MonoBehaviour
                 historyManager.IncreaseCursorIndex();
                 grid.RenderColorGrid(historyManager.GetGridAtCursor());
             }
+
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                StartCoroutine(UpdateGame());
+            }
         }
     }
 
     private IEnumerator UpdateGame()
     {
-        updating = true;
+        isUpdating = true;
 
         while (grid.CheckAnimations())
         {
@@ -82,25 +87,25 @@ public class GameManager : MonoBehaviour
 
         while (grid.CheckMatches())
         {
-            if (GameConfig.Debug) historyManager.AddGrid(grid.GetColorGrid());
+            if (GameConfig.IsDebug) historyManager.AddGrid(grid.GetColorGrid());
             grid.DestroyMatches();
             int removedTiles = grid.UpdateGrid();
             scoreManager.IncreaseScore(removedTiles * 10);
             grid.AnimateDrops();
             grid.FillEmptyGrids();
-            if (GameConfig.Debug) historyManager.AddGrid(grid.GetColorGrid());
+            if (GameConfig.IsDebug) historyManager.AddGrid(grid.GetColorGrid());
             while (grid.CheckAnimations())
             {
                 yield return new WaitForSeconds(0.05f);
             }
         }
 
-        updating = false;
+        isUpdating = false;
     }
 
     private IEnumerator CheckClick()
     {
-        updating = true;
+        isUpdating = true;
 
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         // Check if clicked on a tile
@@ -152,6 +157,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        updating = false;
+        isUpdating = false;
     }
 }
