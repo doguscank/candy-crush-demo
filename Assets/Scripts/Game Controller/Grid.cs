@@ -53,7 +53,7 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                colorGrid[i, j] = mGrid[i, j].GetComponent<BaseObject>().GetColor();
+                colorGrid[i, j] = mGrid[i, j].GetComponent<BaseTile>().GetColor();
             }
         }
 
@@ -77,7 +77,7 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                mGrid[i, j].GetComponent<BaseObject>().DestroyImmediate();
+                mGrid[i, j].GetComponent<BaseTile>().DestroyImmediate();
             }
         }
     }
@@ -88,7 +88,7 @@ public class Grid
             return null;
 
         GameObject newTile = GameObject.Instantiate(mPrefab);
-        var script = newTile.GetComponent<BaseObject>();
+        var script = newTile.GetComponent<BaseTile>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
             minXPos + col * GameConfig.TileSpacing,
@@ -112,12 +112,12 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols - GameConfig.MinSequenceLength + 1; j++)
             {
-                Color currentItemColor = mGrid[i, j].GetComponent<BaseObject>().GetColor();
+                Color currentItemColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
                 int currentSequenceLength = 1;
 
                 for (int k = j + 1; k < Mathf.Min(j + GameConfig.MaxSequenceLength, GameConfig.Cols); k++)
                 {
-                    if (mGrid[i, k].GetComponent<BaseObject>().GetColor() == currentItemColor)
+                    if (mGrid[i, k].GetComponent<BaseTile>().GetColor() == currentItemColor)
                     {
                         currentSequenceLength++;
                     }
@@ -131,8 +131,8 @@ public class Grid
                     {
                         hasMatch = true;
                         if (GameConfig.IsDebug)
-                            mGrid[i, j + k].GetComponent<BaseObject>().SetSelected(true);
-                        mGrid[i, j + k].GetComponent<BaseObject>().SetMarked();
+                            mGrid[i, j + k].GetComponent<BaseTile>().SetSelected(true);
+                        mGrid[i, j + k].GetComponent<BaseTile>().SetMarked();
                     }
 
                     break;
@@ -146,12 +146,12 @@ public class Grid
         {
             for (int i = 0; i < GameConfig.Rows - GameConfig.MinSequenceLength + 1; i++)
             {
-                Color currentItemColor = mGrid[i, j].GetComponent<BaseObject>().GetColor();
+                Color currentItemColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
                 int currentSequenceLength = 1;
 
                 for (int k = i + 1; k < Mathf.Min(i + GameConfig.MaxSequenceLength, GameConfig.Rows); k++)
                 {
-                    if (mGrid[k, j].GetComponent<BaseObject>().GetColor() == currentItemColor)
+                    if (mGrid[k, j].GetComponent<BaseTile>().GetColor() == currentItemColor)
                     {
                         currentSequenceLength++;
                     }
@@ -165,8 +165,8 @@ public class Grid
                     {
                         hasMatch = true;
                         if (GameConfig.IsDebug)
-                            mGrid[i + k, j].GetComponent<BaseObject>().SetSelected(true);
-                        mGrid[i + k, j].GetComponent<BaseObject>().SetMarked();
+                            mGrid[i + k, j].GetComponent<BaseTile>().SetSelected(true);
+                        mGrid[i + k, j].GetComponent<BaseTile>().SetMarked();
                     }
 
                     break;
@@ -182,7 +182,7 @@ public class Grid
     {
         for (int i = 0; i < GameConfig.Rows; i++)
             for (int j = 0; j < GameConfig.Cols; j++)
-                mGrid[i, j].GetComponent<BaseObject>().DeactivateMarked();
+                mGrid[i, j].GetComponent<BaseTile>().DeactivateMarked();
 
         for (int j = 0; j < GameConfig.Cols; j++)
         {
@@ -192,7 +192,7 @@ public class Grid
                 {
                     for (int k = i - 1; k >= 0; k--)
                     {
-                        mGrid[k, j].GetComponent<BaseObject>().IncreaseDropDepth();
+                        mGrid[k, j].GetComponent<BaseTile>().IncreaseDropDepth();
                     }
                 }
             }
@@ -208,7 +208,7 @@ public class Grid
             for (int j = 0; j < GameConfig.Cols; j++)
             {
                 var currentTile = mGrid[i, j];
-                var obj = currentTile.GetComponent<BaseObject>();
+                var obj = currentTile.GetComponent<BaseTile>();
 
                 if (!currentTile.activeSelf)
                 {
@@ -274,7 +274,7 @@ public class Grid
 
         foreach (var obj in createdTiles)
         {
-            obj.GetComponent<BaseObject>().AnimateDrop();
+            obj.GetComponent<BaseTile>().AnimateDrop();
         }
     }
 
@@ -286,7 +286,7 @@ public class Grid
             {
                 if (mGrid[i, j] != null)
                 {
-                    mGrid[i, j].GetComponent<BaseObject>().AnimateDrop(animation: animation);
+                    mGrid[i, j].GetComponent<BaseTile>().AnimateDrop(animation: animation);
                 }
             }
         }
@@ -311,8 +311,8 @@ public class Grid
     {
         if ((Mathf.Abs(row1 - row2) == 1 && col1 == col2) || (Mathf.Abs(col1 - col2) == 1 && row1 == row2))
         {
-            var item1 = mGrid[row1, col1].GetComponent<BaseObject>();
-            var item2 = mGrid[row2, col2].GetComponent<BaseObject>();
+            var item1 = mGrid[row1, col1].GetComponent<BaseTile>();
+            var item2 = mGrid[row2, col2].GetComponent<BaseTile>();
 
             var pos1 = item1.GetPosition();
             var pos2 = item2.GetPosition();
@@ -338,7 +338,7 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                mGrid[i, j].GetComponent<BaseObject>().SetColor(colorGrid[i, j]);
+                mGrid[i, j].GetComponent<BaseTile>().SetColor(colorGrid[i, j]);
             }
         }
     }

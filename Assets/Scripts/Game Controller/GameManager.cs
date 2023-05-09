@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
             if (mFirstSelected == null)
             {
                 mFirstSelected = hit.collider.gameObject;
-                mFirstSelected.GetComponent<BaseObject>().SetSelected();
+                mFirstSelected.GetComponent<BaseTile>().SetSelected();
             }
             else if (mSecondSelected == null)
             {
@@ -120,8 +120,8 @@ public class GameManager : MonoBehaviour
                 {
                     mSecondSelected = hit.collider.gameObject;
 
-                    var firstScript = mFirstSelected.GetComponent<BaseObject>();
-                    var secondScript = mSecondSelected.GetComponent<BaseObject>();
+                    var firstScript = mFirstSelected.GetComponent<BaseTile>();
+                    var secondScript = mSecondSelected.GetComponent<BaseTile>();
 
                     var firstCoords = firstScript.GetCoords();
                     var secondCoords = secondScript.GetCoords();
@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
 
-                mFirstSelected.GetComponent<BaseObject>().SetSelected(selected: false);
+                mFirstSelected.GetComponent<BaseTile>().SetSelected(selected: false);
 
                 mFirstSelected = null;
                 mSecondSelected = null;
