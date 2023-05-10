@@ -11,7 +11,7 @@ public class GridPattern
         mElements = elements;
     }
 
-    public new Powerups.PowerupType GetTileType()
+    public Powerups.PowerupType GetTileType()
     {
         return mType;
     }

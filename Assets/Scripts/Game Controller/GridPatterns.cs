@@ -136,7 +136,7 @@ public class GridPatterns : IEnumerable<GridPattern>
                     (0, 0),
                     (0, 1),
                     (0, 2),
-                    (2, 1),
+                    (1, 2),
                     (2, 2)
                 }
             )

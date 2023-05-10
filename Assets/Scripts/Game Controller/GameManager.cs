@@ -20,13 +20,13 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        Random.InitState(42);
-        
         mScoreText = mScoreObject.GetComponent<TMP_Text>();
 
         if (GameConfig.IsDebug)
         {
-            Random.InitState(42);
+            if (GameConfig.RandomSeed != -1)
+                Random.InitState(GameConfig.RandomSeed);
+
             mHistoryManager = new GridHistoryManager();
         }
 
@@ -58,7 +58,6 @@ public class GameManager : MonoBehaviour
         { StartCoroutine(CheckClick()); }
 
         // Don't update game in debug mode
-        // if (!mIsUpdating && !GameConfig.IsDebug && mIsClicked)
         if (!mIsUpdating && mIsClicked)
         { StartCoroutine(UpdateGame()); }
 
@@ -90,8 +89,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator UpdateGame()
     {
-        // mIsUpdating = true;
-
+        mIsUpdating = true;
+        
         yield return StartCoroutine(WaitForAnimations());
 
         while (mGrid.CheckMatches())
@@ -102,7 +101,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Finished UpdateGame call.");
 
         mIsClicked = false;
-        // mIsUpdating = false;
+        mIsUpdating = false;
     }
 
     private IEnumerator CallUpdateLoop()
@@ -115,6 +114,7 @@ public class GameManager : MonoBehaviour
         mGrid.FillEmptyGrids();
         if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
         yield return StartCoroutine(WaitForAnimations());
+        mGrid.ClearSelected();
     }
 
     private IEnumerator CheckClick()
@@ -144,6 +144,7 @@ public class GameManager : MonoBehaviour
             if (hit.collider.gameObject != mFirstSelected)
             {
                 mSecondSelected = hit.collider.gameObject;
+                mSecondSelected.GetComponent<BaseTile>().SetIsSelected();
 
                 var firstCoords = mFirstSelected.GetComponent<BaseTile>().GetCoords();
                 var secondCoords = mSecondSelected.GetComponent<BaseTile>().GetCoords();

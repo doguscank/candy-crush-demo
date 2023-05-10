@@ -14,4 +14,5 @@ public class GameConfig
     // Debug options
     public static readonly bool IsDebug = false;
     public static readonly int HistorySize = 100;
+    public static readonly int RandomSeed = -1;
 }

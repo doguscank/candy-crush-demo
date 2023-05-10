@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Grid
@@ -22,6 +23,8 @@ public class Grid
 
     public GameObject[,] GetGrid()
     {
+        // UNUSED
+        
         // Create a new array with the same dimensions as the original
         GameObject[,] copyGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
 
@@ -191,6 +194,27 @@ public class Grid
         return isMatched;
     }
 
+    private int[,] CalculateDropDepths(Func<GameObject, bool> filter, GameObject[,] tiles)
+    {
+        int[,] dropDepths = new int[GameConfig.Rows, GameConfig.Cols];
+
+        for (int j = 0; j < GameConfig.Cols; j++)
+        {
+            for (int i = 0; i < GameConfig.Rows; i++)
+            {
+                if (filter(tiles[i, j]))
+                {
+                    for (int k = i; k >= 0; k--)
+                    {
+                        dropDepths[k, j]++;
+                    }
+                }
+            }
+        }
+
+        return dropDepths;
+    }
+
     public void DestroyMatches()
     {
         Debug.Log("DestroyMatches called.");
@@ -203,18 +227,33 @@ public class Grid
             }
         }
 
+        bool CheckIsNotActive(GameObject tile)
+        {
+            return !tile.activeSelf;
+        }
+
+        // for (int j = 0; j < GameConfig.Cols; j++)
+        // {
+        //     for (int i = GameConfig.Rows - 1; i >= 0; i--)
+        //     {
+        //         // BUG: Since powerups are active, tiles don't drop properly
+        //         if (!mGrid[i, j].activeSelf)
+        //         {
+        //             for (int k = i; k >= 0; k--)
+        //             {
+        //                 mGrid[k, j].GetComponent<BaseTile>().IncreaseDropDepth();
+        //             }
+        //         }
+        //     }
+        // }
+
+        int [,] dropDepths = CalculateDropDepths(CheckIsNotActive, mGrid);
+
         for (int j = 0; j < GameConfig.Cols; j++)
         {
             for (int i = GameConfig.Rows - 1; i >= 0; i--)
             {
-                // BUG: Since powerups are active, tiles don't drop properly
-                if (!mGrid[i, j].activeSelf)
-                {
-                    for (int k = i - 1; k >= 0; k--)
-                    {
-                        mGrid[k, j].GetComponent<BaseTile>().IncreaseDropDepth();
-                    }
-                }
+                mGrid[i, j].GetComponent<BaseTile>().IncreaseDropDepth(dropDepths[i, j]);
             }
         }
     }
@@ -267,19 +306,39 @@ public class Grid
 
     public void FillEmptyGrids()
     {
-        int[] dropDepths = new int[GameConfig.Cols];
-        List<GameObject> createdTiles = new List<GameObject>();
+        // int[] dropDepths = new int[GameConfig.Cols];
+        // List<GameObject> createdTiles = new List<GameObject>();
 
-        for (int j = 0; j < GameConfig.Cols; j++)
+        // for (int j = 0; j < GameConfig.Cols; j++)
+        // {
+        //     for (int i = 0; i < GameConfig.Rows; i++)
+        //     {
+        //         if (mGrid[i, j] == null)
+        //             dropDepths[j]++;
+        //         else
+        //             break;
+        //     }
+        // }
+
+        // for (int i = 0; i < GameConfig.Rows; i++)
+        // {
+        //     for (int j = 0; j < GameConfig.Cols; j++)
+        //     {
+        //         if (mGrid[i, j] == null)
+        //         {
+        //             createdTiles.Add(CreateTileAt(i, j, dropDepths[j]));
+        //         }
+        //     }
+        // }
+
+        bool CheckIsNull(GameObject tile)
         {
-            for (int i = 0; i < GameConfig.Rows; i++)
-            {
-                if (mGrid[i, j] == null)
-                    dropDepths[j]++;
-                else
-                    break;
-            }
+            return tile == null;
         }
+
+        int[,] dropDepths = CalculateDropDepths(CheckIsNull, mGrid);
+        
+        List<GameObject> createdTiles = new List<GameObject>();
 
         for (int i = 0; i < GameConfig.Rows; i++)
         {
@@ -287,7 +346,7 @@ public class Grid
             {
                 if (mGrid[i, j] == null)
                 {
-                    createdTiles.Add(CreateTileAt(i, j, dropDepths[j]));
+                    createdTiles.Add(CreateTileAt(i, j, dropDepths[i, j]));
                 }
             }
         }
@@ -349,6 +408,17 @@ public class Grid
             mGrid[row2, col2] = temp;
 
             Debug.Log($"Switched ({row1},{col1}) with ({row2},{col2})");
+        }
+    }
+
+    public void ClearSelected()
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
+            {
+                mGrid[i, j].GetComponent<BaseTile>().SetIsSelected(isSelected: false);
+            }
         }
     }
 
