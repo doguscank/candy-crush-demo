@@ -4,11 +4,11 @@ using TMPro;
 
 public class BaseTile : MonoBehaviour, ITile
 {
-    private bool mIsMarked = false;
-    private bool mIsSelected = false;
-    private int mDropDepth;
+    [SerializeField] private bool mIsMarked = false;
+    [SerializeField] private bool mIsSelected = false;
+    [SerializeField] private int mDropDepth;
 
-    private Vector2Int mCoords;
+    [SerializeField] private Vector2Int mCoords;
 
     private SpriteRenderer mSpriteRenderer;
     private GameObject mHighlight;
@@ -27,31 +27,37 @@ public class BaseTile : MonoBehaviour, ITile
 
         if (GameConfig.IsDebug)
         {
-            // Create a new GameObject to hold the text
-            GameObject textObject = new GameObject("Text");
-            textObject.transform.parent = transform; // Make the textObject a child of this GameObject
-
-            // Add a TextMeshPro component to the textObject
-            TextMeshPro textMesh = textObject.AddComponent<TextMeshPro>();
-            textMesh.text = "1,1"; // Set the text
-
-            mDebugText = textMesh;
-
-            // Set the font size and alignment of the textMesh
-            textMesh.fontSize = 6; // Set the font size
-            textMesh.alignment = TextAlignmentOptions.Center; // Set the alignment to center
-
-            // Set the position of the textMesh relative to the GameObject's transform
-            textMesh.rectTransform.localPosition = new Vector3(0, 0, 0); // Adjust the position as needed
-
-            // Set local scale to 1
-            textMesh.rectTransform.localScale = new Vector3(1f, 1f, 1f);
+            CreateDebugText();
         }
+    }
+
+    private void CreateDebugText()
+    {
+        // Create a new GameObject to hold the text
+        GameObject textObject = new GameObject("DebugText");
+        textObject.transform.parent = transform; // Make the textObject a child of this GameObject
+
+        // Add a TextMeshPro component to the textObject
+        TextMeshPro textMesh = textObject.AddComponent<TextMeshPro>();
+        textMesh.text = "1,1"; // Set the text
+
+        mDebugText = textMesh;
+
+        // Set the font size and alignment of the textMesh
+        textMesh.fontSize = 6; // Set the font size
+        textMesh.alignment = TextAlignmentOptions.Center; // Set the alignment to center
+
+        // Set the position of the textMesh relative to the GameObject's transform
+        textMesh.rectTransform.localPosition = new Vector3(0, 0, 0); // Adjust the position as needed
+
+        // Set local scale to 1
+        textMesh.rectTransform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     public void UpdateAnimation(string clipName, Vector3 targetPosition)
     {
         AnimationClip animationClip = mAnimation.GetClip(clipName);
+        targetPosition = MathUtils.FixVector3(targetPosition);
 
         // Check if clip exists
         if (!animationClip)
@@ -67,7 +73,7 @@ public class BaseTile : MonoBehaviour, ITile
         }
 
         // Get the current position of the object
-        Vector3 startPosition = transform.position;
+        Vector3 startPosition = GetPosition();
 
         AnimationCurve X_PositionCurve = new AnimationCurve();
         AnimationCurve Y_PositionCurve = new AnimationCurve();
@@ -94,16 +100,17 @@ public class BaseTile : MonoBehaviour, ITile
         animationClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", Z_PositionCurve);
     }
 
-    public void AnimateDrop(bool animation = true)
+    public void AnimateDrop(bool isAnimated = true)
     {
         if (mDropDepth > 0)
         {
-            Vector3 endPosition = transform.position - new Vector3(0f, mDropDepth * GameConfig.TileSpacing, 0f);
+            Vector3 endPosition = GetPosition() - MathUtils.FixVector3(new Vector3(0f, mDropDepth * GameConfig.TileSpacing, 0f));
+
+            Debug.Log($"Drop animation played for Tile({mCoords.x},{mCoords.y}) with mDropDepth({mDropDepth}) to endPosition({endPosition.x};{endPosition.y};{endPosition.z})");
             
-            if (animation)
+            if (isAnimated)
             {
-                Vector3 targetPosition = transform.position - new Vector3(0f, mDropDepth * GameConfig.TileSpacing, 0f);
-                UpdateAnimation("DropAnimation", targetPosition);
+                UpdateAnimation("DropAnimation", endPosition);
                 mAnimation.Play("DropAnimation");
             }
             
@@ -115,6 +122,8 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void AnimateSwap(Vector3 endPosition)
     {
+        Debug.Log($"Swap animation played for Tile({mCoords.x},{mCoords.y}) to endPosition({endPosition.x};{endPosition.y};{endPosition.z})");
+
         UpdateAnimation("SwapAnimation", endPosition);
         mAnimation.Play("SwapAnimation");
 
@@ -124,6 +133,14 @@ public class BaseTile : MonoBehaviour, ITile
     public void SetMarked()
     {
         mIsMarked = true;
+
+        if (GameConfig.IsDebug)
+            mHighlight.SetActive(true);
+    }
+
+    public bool GetMarked()
+    {
+        return mIsMarked;
     }
 
     public bool DeactivateMarked()
@@ -165,17 +182,12 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void SetPosition(Vector3 position)
     {
-        transform.position = position;
-    }
-
-    public void SetPosition(Vector2Int position)
-    {
-        SetPosition(new Vector3(position.x, position.y, 0f));
+        transform.position = MathUtils.FixVector3(position);
     }
 
     public Vector3 GetPosition()
     {
-        return transform.position;
+        return MathUtils.FixVector3(transform.position);
     }
 
     public void IncreaseDropDepth(int mDropDepth = 1)

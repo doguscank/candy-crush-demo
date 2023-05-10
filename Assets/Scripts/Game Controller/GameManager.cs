@@ -9,10 +9,11 @@ public class GameManager : MonoBehaviour
     private GridHistoryManager mHistoryManager;
     private ScoreManager mScoreManager;
 
-    private bool isUpdating = false;
+    [SerializeField] private bool mIsUpdating = false;
+    [SerializeField] private bool mIsClicked = false;
 
-    private GameObject mFirstSelected;
-    private GameObject mSecondSelected;
+    [SerializeField] private GameObject mFirstSelected;
+    [SerializeField] private GameObject mSecondSelected;
 
     public GameObject mScoreObject;
     public TMP_Text mScoreText;
@@ -20,14 +21,17 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         mScoreText = mScoreObject.GetComponent<TMP_Text>();
-        Random.InitState(42);
+
+        if (GameConfig.IsDebug)
+        {
+            Random.InitState(42);
+            mHistoryManager = new GridHistoryManager();
+        }
 
         mGrid = new Grid();
         mGrid.InitializeGrid();
 
         mScoreManager = new ScoreManager(mScoreText);
-
-        if (GameConfig.IsDebug) mHistoryManager = new GridHistoryManager();
 
         mFirstSelected = null;
         mSecondSelected = null;
@@ -41,120 +45,139 @@ public class GameManager : MonoBehaviour
             mGrid.DestroyMatches();
             mGrid.UpdateGrid();
             mGrid.FillEmptyGridInitial();
-            mGrid.AnimateDrops(animation: false);
+            mGrid.AnimateDrops(isAnimated: false);
         }
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !isUpdating)
-            StartCoroutine(CheckClick());
+        // MouseButton0 is left click
+        if (Input.GetMouseButtonDown(0) && !mIsUpdating)
+        { StartCoroutine(CheckClick()); }
 
-        if (!isUpdating && !GameConfig.IsDebug)
-            StartCoroutine(UpdateGame());
+        // Don't update game in debug mode
+        // if (!mIsUpdating && !GameConfig.IsDebug && mIsClicked)
+        if (!mIsUpdating && mIsClicked)
+        { StartCoroutine(UpdateGame()); }
 
         if (GameConfig.IsDebug)
         {
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                mHistoryManager.DecreaseCursorIndex();
-                mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
-            }
+            CheckDebugKeys();
+        }
+    }
 
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                mHistoryManager.IncreaseCursorIndex();
-                mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
-            }
+    private void CheckDebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            mHistoryManager.DecreaseCursorIndex();
+            mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
+        }
 
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                StartCoroutine(UpdateGame());
-            }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            mHistoryManager.IncreaseCursorIndex();
+            mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
+        }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            StartCoroutine(UpdateGame());
         }
     }
 
     private IEnumerator UpdateGame()
     {
-        isUpdating = true;
+        mIsUpdating = true;
 
-        while (mGrid.CheckAnimations())
-        {
-            yield return new WaitForSeconds(0.05f);
-        }
+        yield return StartCoroutine(WaitForAnimations());
 
         while (mGrid.CheckMatches())
         {
-            if (GameConfig.IsDebug) mHistoryManager.AddGrid(mGrid.GetColorGrid());
+            if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
             mGrid.DestroyMatches();
             int removedTiles = mGrid.UpdateGrid();
             mScoreManager.IncreaseScore(removedTiles * 10);
             mGrid.AnimateDrops();
             mGrid.FillEmptyGrids();
-            if (GameConfig.IsDebug) mHistoryManager.AddGrid(mGrid.GetColorGrid());
-            while (mGrid.CheckAnimations())
-            {
-                yield return new WaitForSeconds(0.05f);
-            }
+            if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
+            yield return StartCoroutine(WaitForAnimations());
         }
 
-        isUpdating = false;
+        Debug.Log("Finished UpdateGame call.");
+
+        mIsClicked = false;
+        mIsUpdating = false;
     }
 
     private IEnumerator CheckClick()
     {
-        isUpdating = true;
+        mIsUpdating = true;
+        mIsClicked = true;
 
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
         // Check if clicked on a tile
         if (hit.collider != null)
         {
-            if (mFirstSelected == null)
-            {
-                mFirstSelected = hit.collider.gameObject;
-                mFirstSelected.GetComponent<BaseTile>().SetSelected();
-            }
-            else if (mSecondSelected == null)
-            {
-                if (hit.collider.gameObject != mFirstSelected)
-                {
-                    mSecondSelected = hit.collider.gameObject;
-
-                    var firstScript = mFirstSelected.GetComponent<BaseTile>();
-                    var secondScript = mSecondSelected.GetComponent<BaseTile>();
-
-                    var firstCoords = firstScript.GetCoords();
-                    var secondCoords = secondScript.GetCoords();
-
-                    mGrid.SwitchTiles(firstCoords.x, firstCoords.y, secondCoords.x, secondCoords.y);
-
-                    while (mGrid.CheckAnimations())
-                    {
-                        yield return new WaitForSeconds(0.05f);
-                    }
-
-                    yield return new WaitForSeconds(0.2f);
-
-                    bool validSwitch = mGrid.CheckMatches();
-                    if (!validSwitch)
-                    {
-                        // Reswitch if not valid
-                        mGrid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
-
-                        while (mGrid.CheckAnimations())
-                        {
-                            yield return new WaitForSeconds(0.05f);
-                        }
-                    }
-                }
-
-                mFirstSelected.GetComponent<BaseTile>().SetSelected(selected: false);
-
-                mFirstSelected = null;
-                mSecondSelected = null;
-            }
+            yield return StartCoroutine(CheckHit(hit));
         }
 
-        isUpdating = false;
+        mIsUpdating = false;
+    }
+
+    private IEnumerator CheckHit(RaycastHit2D hit)
+    {
+        if (mFirstSelected == null)
+        {
+            mFirstSelected = hit.collider.gameObject;
+            mFirstSelected.GetComponent<BaseTile>().SetSelected();
+        }
+        else
+        {
+            if (hit.collider.gameObject != mFirstSelected)
+            {
+                mSecondSelected = hit.collider.gameObject;
+
+                var firstCoords = mFirstSelected.GetComponent<BaseTile>().GetCoords();
+                var secondCoords = mSecondSelected.GetComponent<BaseTile>().GetCoords();
+
+                yield return StartCoroutine(SwitchTiles(firstCoords, secondCoords));
+            }
+
+            mFirstSelected.GetComponent<BaseTile>().SetSelected(selected: false);
+
+            mFirstSelected = null;
+            mSecondSelected = null;
+        }
+    }
+
+    private IEnumerator SwitchTiles(Vector2Int firstCoords, Vector2Int secondCoords)
+    {
+        mGrid.SwitchTiles(firstCoords.x, firstCoords.y, secondCoords.x, secondCoords.y);
+
+        yield return StartCoroutine(WaitForAnimations());
+
+        yield return new WaitForSeconds(GameConfig.GridCheckDoneDelay);
+
+        bool isValidSwitch = mGrid.CheckMatches();
+        if (!isValidSwitch)
+        {
+            // Reswitch if not valid
+            mGrid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
+
+            yield return StartCoroutine(WaitForAnimations());
+        }
+    }
+
+    private IEnumerator WaitForAnimations()
+    {
+        Debug.Log("Animation check started.");
+
+        while (mGrid.CheckAnimations())
+        {
+            yield return new WaitForSeconds(GameConfig.GridCheckDelay);
+        }
+
+        Debug.Log("Animation check finished.");
     }
 }

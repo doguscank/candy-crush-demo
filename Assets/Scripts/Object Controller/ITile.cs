@@ -6,6 +6,7 @@ public interface ITile
     public void AnimateDrop(bool animation = true);
     public void AnimateSwap(Vector3 endPosition);
     public void SetMarked();
+    public bool GetMarked();
     public bool DeactivateMarked();
     public void Destroy();
     public void DestroyImmediate();
@@ -13,7 +14,6 @@ public interface ITile
     public void SetColor(Color color);
     public void SetRandomColor();
     public void SetPosition(Vector3 position);
-    public void SetPosition(Vector2Int position);
     public Vector3 GetPosition();
     public void IncreaseDropDepth(int mDropDepth = 1);
     public int GetDropDepth();

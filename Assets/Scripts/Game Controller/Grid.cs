@@ -6,11 +6,15 @@ public class Grid
     private float minXPos;
     private float maxYPos;
 
+    private GridPatterns mGridPatterns;
+
     [SerializeField] private GameObject mPrefab;
     [SerializeField] private GameObject[,] mGrid;
 
     public Grid()
     {
+        mGridPatterns = new GridPatterns();
+
         minXPos = -GameConfig.TileSpacing * (int)(GameConfig.Cols / 2);
         maxYPos = GameConfig.TileSpacing * (int)(GameConfig.Rows / 2);
 
@@ -69,6 +73,8 @@ public class Grid
                 CreateTileAt(i, j);
             }
         }
+
+        Debug.Log("Initialized grid.");
     }
 
     public void ClearGrid()
@@ -80,6 +86,8 @@ public class Grid
                 mGrid[i, j].GetComponent<BaseTile>().DestroyImmediate();
             }
         }
+
+        Debug.Log("Cleaned grid");
     }
 
     public GameObject CreateTileAt(int row, int col, int dropDepth = 0)
@@ -100,89 +108,93 @@ public class Grid
 
         mGrid[row, col] = newTile;
 
+        Debug.Log($"Created new tile at ({row},{col}) with color({script.GetColor()})");
+
         return newTile;
     }
 
     public bool CheckMatches()
     {
-        bool hasMatch = false;
+        Debug.Log("CheckMatches triggered.");
 
-        // Check mGrid for horizontal matches
+        bool isMatched = false;
+
+        bool IsInBound(int row, int col)
+        {
+            return row >= 0 && row < GameConfig.Rows && col >= 0 && col < GameConfig.Cols;
+        }
+
+        bool IsColorMatched(Color color, int row, int col)
+        {
+            return mGrid[row, col].GetComponent<BaseTile>().GetColor() == color;
+        }
+
+        bool IsTileMarked(int row, int col)
+        {
+            return mGrid[row, col].GetComponent<BaseTile>().GetMarked();
+        }
+
+        bool CheckPattern(GridPattern pattern, Color color, int row, int col)
+        {
+            foreach (var item in pattern.GetElements())
+            {
+                int newRow = row + item.Item1;
+                int newCol = col + item.Item2;
+
+                if (!(IsInBound(newRow, newCol) && IsColorMatched(color, newRow, newCol) /*&& IsTileMarked(newRow, newCol)*/))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        void MarkPattern(GridPattern pattern, int row, int col)
+        {
+            mGrid[row, col].GetComponent<BaseTile>().SetMarked();
+
+            foreach (var item in pattern.GetElements())
+            {
+                int newRow = row + item.Item1;
+                int newCol = col + item.Item2;
+
+                mGrid[newRow, newCol].GetComponent<BaseTile>().SetMarked();
+            }
+        }
+
         for (int i = 0; i < GameConfig.Rows; i++)
         {
-            for (int j = 0; j < GameConfig.Cols - GameConfig.MinSequenceLength + 1; j++)
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
-                Color currentItemColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
-                int currentSequenceLength = 1;
+                Color currentColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
 
-                for (int k = j + 1; k < Mathf.Min(j + GameConfig.MaxSequenceLength, GameConfig.Cols); k++)
+                // Get each pattern
+                foreach (var pattern in mGridPatterns)
                 {
-                    if (mGrid[i, k].GetComponent<BaseTile>().GetColor() == currentItemColor)
+                    if (CheckPattern(pattern, currentColor, i, j))
                     {
-                        currentSequenceLength++;
+                        MarkPattern(pattern, i, j);
+                        isMatched = true;
                     }
-                    else
-                        break;
                 }
-
-                if (currentSequenceLength >= GameConfig.MinSequenceLength)
-                {
-                    for (int k = 0; k < currentSequenceLength; k++)
-                    {
-                        hasMatch = true;
-                        if (GameConfig.IsDebug)
-                            mGrid[i, j + k].GetComponent<BaseTile>().SetSelected(true);
-                        mGrid[i, j + k].GetComponent<BaseTile>().SetMarked();
-                    }
-
-                    break;
-                }
-
             }
         }
 
-        // Check mGrid for vertical matches
-        for (int j = 0; j < GameConfig.Cols; j++)
-        {
-            for (int i = 0; i < GameConfig.Rows - GameConfig.MinSequenceLength + 1; i++)
-            {
-                Color currentItemColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
-                int currentSequenceLength = 1;
-
-                for (int k = i + 1; k < Mathf.Min(i + GameConfig.MaxSequenceLength, GameConfig.Rows); k++)
-                {
-                    if (mGrid[k, j].GetComponent<BaseTile>().GetColor() == currentItemColor)
-                    {
-                        currentSequenceLength++;
-                    }
-                    else
-                        break;
-                }
-
-                if (currentSequenceLength >= GameConfig.MinSequenceLength)
-                {
-                    for (int k = 0; k < currentSequenceLength; k++)
-                    {
-                        hasMatch = true;
-                        if (GameConfig.IsDebug)
-                            mGrid[i + k, j].GetComponent<BaseTile>().SetSelected(true);
-                        mGrid[i + k, j].GetComponent<BaseTile>().SetMarked();
-                    }
-
-                    break;
-                }
-
-            }
-        }
-
-        return hasMatch;
+        return isMatched;
     }
 
     public void DestroyMatches()
     {
+        Debug.Log("DestroyMatches called.");
+
         for (int i = 0; i < GameConfig.Rows; i++)
+        {
             for (int j = 0; j < GameConfig.Cols; j++)
+            {
                 mGrid[i, j].GetComponent<BaseTile>().DeactivateMarked();
+            }
+        }
 
         for (int j = 0; j < GameConfig.Cols; j++)
         {
@@ -278,7 +290,7 @@ public class Grid
         }
     }
 
-    public void AnimateDrops(bool animation = true)
+    public void AnimateDrops(bool isAnimated = true)
     {
         for (int i = 0; i < GameConfig.Rows; i++)
         {
@@ -286,7 +298,7 @@ public class Grid
             {
                 if (mGrid[i, j] != null)
                 {
-                    mGrid[i, j].GetComponent<BaseTile>().AnimateDrop(animation: animation);
+                    mGrid[i, j].GetComponent<BaseTile>().AnimateDrop(isAnimated: isAnimated);
                 }
             }
         }

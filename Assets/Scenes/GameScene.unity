@@ -167,6 +167,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf738af114e05fd4d889922147064200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mIsUpdating: 0
+  mIsClicked: 0
+  mFirstSelected: {fileID: 0}
+  mSecondSelected: {fileID: 0}
   mScoreObject: {fileID: 1121477922}
   mScoreText: {fileID: 0}
 --- !u!1 &139287287
