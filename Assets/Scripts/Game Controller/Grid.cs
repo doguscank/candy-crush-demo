@@ -134,7 +134,7 @@ public class Grid
             return mGrid[row, col].GetComponent<BaseTile>().GetMarked();
         }
 
-        bool CheckPattern(GridPattern pattern, Color color, int row, int col)
+        bool IsPatternMatched(GridPattern pattern, Color color, int row, int col)
         {
             foreach (var item in pattern.GetElements())
             {
@@ -180,7 +180,7 @@ public class Grid
                 // Get each pattern
                 foreach (var pattern in mGridPatterns)
                 {
-                    if (CheckPattern(pattern, currentColor, i, j))
+                    if (IsPatternMatched(pattern, currentColor, i, j))
                     {
                         MarkPattern(pattern, i, j);
                         Debug.Log($"Match found with pattern {pattern.GetTileType()}. Tile is selected: {tile.GetIsSelected()}");
