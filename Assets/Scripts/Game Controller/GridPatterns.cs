@@ -19,6 +19,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.ColorRemover,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (3, 0),
@@ -32,6 +33,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.ColorRemover,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (0, 3),
@@ -45,6 +47,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (-1, 1),
@@ -56,6 +59,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (1, 1),
@@ -67,6 +71,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (-1, 2),
@@ -78,6 +83,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (1, 1),
@@ -91,6 +97,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (2, 1),
@@ -102,6 +109,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (2, -1),
@@ -113,6 +121,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (0, 1),
@@ -124,6 +133,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.Bomb,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (2, 1),
@@ -137,6 +147,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.ColumnRemover,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0),
                     (3, 0)
@@ -149,6 +160,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.RowRemover,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2),
                     (0, 3)
@@ -161,6 +173,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.NoPowerup,
                 new List<(int, int)> {
+                    (0, 0),
                     (1, 0),
                     (2, 0)
                 }
@@ -172,6 +185,7 @@ public class GridPatterns : IEnumerable<GridPattern>
             new GridPattern(
                 Powerups.PowerupType.NoPowerup,
                 new List<(int, int)> {
+                    (0, 0),
                     (0, 1),
                     (0, 2)
                 }

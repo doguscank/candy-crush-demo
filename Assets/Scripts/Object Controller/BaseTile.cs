@@ -4,26 +4,33 @@ using TMPro;
 
 public class BaseTile : MonoBehaviour, ITile
 {
-    [SerializeField] private bool mIsMarked = false;
-    [SerializeField] private bool mIsSelected = false;
-    [SerializeField] private int mDropDepth;
+    [SerializeField] protected bool mIsMarked;
+    [SerializeField] protected bool mIsSelected;
+    [SerializeField] protected int mDropDepth;
+    [SerializeField] protected Powerups.PowerupType mTileType;
 
-    [SerializeField] private Vector2Int mCoords;
+    [SerializeField] protected Vector2Int mCoords;
 
-    private SpriteRenderer mSpriteRenderer;
-    private GameObject mHighlight;
-    private Color mColor;
+    protected SpriteRenderer mSpriteRenderer;
+    protected GameObject mHighlight;
+    protected Color mColor;
 
-    private TextMeshPro mDebugText;
+    protected TextMeshPro mDebugText;
 
-    private Animation mAnimation;
+    protected Animation mAnimation;
 
     void Awake()
     {
+        mIsMarked = false;
+        mIsSelected = false;
+
         mSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        mSpriteRenderer.color = Color.white;
+
         mAnimation = gameObject.GetComponent<Animation>();
         mHighlight = gameObject.transform.GetChild(0).gameObject;
         mDropDepth = 0;
+        mTileType = Powerups.PowerupType.NoPowerup;
 
         if (GameConfig.IsDebug)
         {
@@ -31,7 +38,7 @@ public class BaseTile : MonoBehaviour, ITile
         }
     }
 
-    private void CreateDebugText()
+    protected void CreateDebugText()
     {
         // Create a new GameObject to hold the text
         GameObject textObject = new GameObject("DebugText");
@@ -130,12 +137,29 @@ public class BaseTile : MonoBehaviour, ITile
         SetPosition(endPosition);
     }
 
-    public void SetMarked()
+    public void ActivateEffect()
     {
-        mIsMarked = true;
+
+    }
+
+    public void SetTileType(Powerups.PowerupType type)
+    {
+        Debug.Log($"Updated type of tile at ({GetCoords().x},{GetCoords().y}) to {type}");
+        mTileType = type;
+        UpdateSprite();
+    }
+
+    public Powerups.PowerupType GetTileType()
+    {
+        return mTileType;
+    }
+
+    public void SetIsMarked(bool isMarked = true)
+    {
+        mIsMarked = isMarked;
 
         if (GameConfig.IsDebug)
-            mHighlight.SetActive(true);
+            mHighlight.SetActive(isMarked);
     }
 
     public bool GetMarked()
@@ -169,10 +193,19 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void SetColor(Color color)
     {
-        mSpriteRenderer.color = Color.white;
-        mSpriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(TileColors.Colors.IndexOf(color) - 1, 0, 0));
-        
         mColor = color;
+        UpdateSprite();
+    }
+
+    public void UpdateSprite()
+    {
+        int columnIndex = TileColors.Colors.IndexOf(mColor) - 1;
+        int rowIndex = -1 * (int)(mTileType);
+        
+        if (mTileType == Powerups.PowerupType.ColorRemover)
+            columnIndex = -1;
+        
+        mSpriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(columnIndex, rowIndex, 0));
     }
 
     public void SetRandomColor()
@@ -220,13 +253,13 @@ public class BaseTile : MonoBehaviour, ITile
         return mCoords;
     }
 
-    public void SetSelected(bool selected = true)
+    public void SetIsSelected(bool isSelected = true)
     {
-        mIsSelected = selected;
-        mHighlight.SetActive(selected);
+        mIsSelected = isSelected;
+        mHighlight.SetActive(isSelected);
     }
 
-    public bool GetSelected()
+    public bool GetIsSelected()
     {
         return mIsSelected;
     }

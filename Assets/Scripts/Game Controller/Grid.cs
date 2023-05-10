@@ -8,7 +8,6 @@ public class Grid
 
     private GridPatterns mGridPatterns;
 
-    [SerializeField] private GameObject mPrefab;
     [SerializeField] private GameObject[,] mGrid;
 
     public Grid()
@@ -17,8 +16,6 @@ public class Grid
 
         minXPos = -GameConfig.TileSpacing * (int)(GameConfig.Cols / 2);
         maxYPos = GameConfig.TileSpacing * (int)(GameConfig.Rows / 2);
-
-        mPrefab = Resources.Load<GameObject>("Prefabs/Tile");
 
         mGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
     }
@@ -95,7 +92,7 @@ public class Grid
         if (row >= GameConfig.Rows || row < 0 || col >= GameConfig.Cols || col < 0)
             return null;
 
-        GameObject newTile = GameObject.Instantiate(mPrefab);
+        GameObject newTile = TileSpawnManager.Instance.SpawnTile(Powerups.PowerupType.NoPowerup);
         var script = newTile.GetComponent<BaseTile>();
         script.SetRandomColor();
         script.SetPosition(new Vector3(
@@ -141,7 +138,7 @@ public class Grid
                 int newRow = row + item.Item1;
                 int newCol = col + item.Item2;
 
-                if (!(IsInBound(newRow, newCol) && IsColorMatched(color, newRow, newCol) /*&& IsTileMarked(newRow, newCol)*/))
+                if (!(IsInBound(newRow, newCol) && IsColorMatched(color, newRow, newCol) && !IsTileMarked(newRow, newCol)))
                 {
                     return false;
                 }
@@ -152,14 +149,21 @@ public class Grid
 
         void MarkPattern(GridPattern pattern, int row, int col)
         {
-            mGrid[row, col].GetComponent<BaseTile>().SetMarked();
-
             foreach (var item in pattern.GetElements())
             {
                 int newRow = row + item.Item1;
                 int newCol = col + item.Item2;
 
-                mGrid[newRow, newCol].GetComponent<BaseTile>().SetMarked();
+                BaseTile newTile = mGrid[newRow, newCol].GetComponent<BaseTile>();
+
+                if (!newTile.GetIsSelected() || pattern.GetTileType() == Powerups.PowerupType.NoPowerup)
+                {
+                    newTile.SetIsMarked();
+                }
+                else if (newTile.GetIsSelected())
+                {
+                    newTile.SetTileType(pattern.GetTileType());
+                }
             }
         }
 
@@ -167,7 +171,8 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                Color currentColor = mGrid[i, j].GetComponent<BaseTile>().GetColor();
+                BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
+                Color currentColor = tile.GetColor();
 
                 // Get each pattern
                 foreach (var pattern in mGridPatterns)
@@ -175,12 +180,14 @@ public class Grid
                     if (CheckPattern(pattern, currentColor, i, j))
                     {
                         MarkPattern(pattern, i, j);
+                        Debug.Log($"Match found with pattern {pattern.GetTileType()}. Tile is selected: {tile.GetIsSelected()}");
                         isMatched = true;
                     }
                 }
             }
         }
 
+        Debug.Log($"isMatched: {isMatched}");
         return isMatched;
     }
 
@@ -200,6 +207,7 @@ public class Grid
         {
             for (int i = GameConfig.Rows - 1; i >= 0; i--)
             {
+                // BUG: Since powerups are active, tiles don't drop properly
                 if (!mGrid[i, j].activeSelf)
                 {
                     for (int k = i - 1; k >= 0; k--)

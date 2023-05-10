@@ -754,6 +754,7 @@ MonoBehaviour:
   mIsMarked: 0
   mIsSelected: 0
   mDropDepth: 0
+  mType: 0
   mCoords: {x: 0, y: 0}
 --- !u!111 &5827605167474554171
 Animation:

@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+        Random.InitState(42);
+        
         mScoreText = mScoreObject.GetComponent<TMP_Text>();
 
         if (GameConfig.IsDebug)
@@ -88,26 +90,31 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator UpdateGame()
     {
-        mIsUpdating = true;
+        // mIsUpdating = true;
 
         yield return StartCoroutine(WaitForAnimations());
 
         while (mGrid.CheckMatches())
         {
-            if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
-            mGrid.DestroyMatches();
-            int removedTiles = mGrid.UpdateGrid();
-            mScoreManager.IncreaseScore(removedTiles * 10);
-            mGrid.AnimateDrops();
-            mGrid.FillEmptyGrids();
-            if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
-            yield return StartCoroutine(WaitForAnimations());
+            yield return StartCoroutine(CallUpdateLoop());
         }
 
         Debug.Log("Finished UpdateGame call.");
 
         mIsClicked = false;
-        mIsUpdating = false;
+        // mIsUpdating = false;
+    }
+
+    private IEnumerator CallUpdateLoop()
+    {
+        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
+        mGrid.DestroyMatches();
+        int removedTiles = mGrid.UpdateGrid();
+        mScoreManager.IncreaseScore(removedTiles * 10);
+        mGrid.AnimateDrops();
+        mGrid.FillEmptyGrids();
+        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
+        yield return StartCoroutine(WaitForAnimations());
     }
 
     private IEnumerator CheckClick()
@@ -130,7 +137,7 @@ public class GameManager : MonoBehaviour
         if (mFirstSelected == null)
         {
             mFirstSelected = hit.collider.gameObject;
-            mFirstSelected.GetComponent<BaseTile>().SetSelected();
+            mFirstSelected.GetComponent<BaseTile>().SetIsSelected();
         }
         else
         {
@@ -143,8 +150,10 @@ public class GameManager : MonoBehaviour
 
                 yield return StartCoroutine(SwitchTiles(firstCoords, secondCoords));
             }
-
-            mFirstSelected.GetComponent<BaseTile>().SetSelected(selected: false);
+            else
+            {
+                mFirstSelected.GetComponent<BaseTile>().SetIsSelected(isSelected: false);
+            }
 
             mFirstSelected = null;
             mSecondSelected = null;
@@ -166,6 +175,10 @@ public class GameManager : MonoBehaviour
             mGrid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
 
             yield return StartCoroutine(WaitForAnimations());
+        }
+        else
+        {
+            yield return StartCoroutine(CallUpdateLoop());
         }
     }
 
