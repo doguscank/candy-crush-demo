@@ -170,16 +170,38 @@ public class Grid
             }
         }
 
-        for (int i = 0; i < GameConfig.Rows; i++)
-        {
-            for (int j = 0; j < GameConfig.Cols; j++)
-            {
-                BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
-                Color currentColor = tile.GetColor();
+        // This algorithm tries to match a pattern for a single tile
+        // Therefore, pattern significance is not true for this algo
+        // for (int i = 0; i < GameConfig.Rows; i++)
+        // {
+        //     for (int j = 0; j < GameConfig.Cols; j++)
+        //     {
+        //         BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
+        //         Color currentColor = tile.GetColor();
 
-                // Get each pattern
-                foreach (var pattern in mGridPatterns)
+        //         // Get each pattern
+        //         foreach (var pattern in mGridPatterns)
+        //         {
+        //             if (IsPatternMatched(pattern, currentColor, i, j))
+        //             {
+        //                 MarkPattern(pattern, i, j);
+        //                 Debug.Log($"Match found with pattern {pattern.GetTileType()}. Tile is selected: {tile.GetIsSelected()}");
+        //                 isMatched = true;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // This algorithm tries to match pattern on the whole grid
+        foreach (var pattern in mGridPatterns)
+        {
+            for (int i = 0; i < GameConfig.Rows; i++)
+            {
+                for (int j = 0; j < GameConfig.Cols; j++)
                 {
+                    BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
+                    Color currentColor = tile.GetColor();
+
                     if (IsPatternMatched(pattern, currentColor, i, j))
                     {
                         MarkPattern(pattern, i, j);
@@ -189,6 +211,7 @@ public class Grid
                 }
             }
         }
+        
 
         Debug.Log($"isMatched: {isMatched}");
         return isMatched;
