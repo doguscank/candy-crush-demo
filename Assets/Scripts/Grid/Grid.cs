@@ -24,7 +24,7 @@ public class Grid
     public GameObject[,] GetGrid()
     {
         // UNUSED
-        
+
         // Create a new array with the same dimensions as the original
         GameObject[,] copyGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
 
@@ -182,6 +182,7 @@ public class Grid
                 var newCol = col + randomCoords.Item2;
 
                 BaseTile newTile = mGrid[newRow, newCol].GetComponent<BaseTile>();
+                newTile.SetIsMarked(isMarked: false);
                 newTile.SetTileType(pattern.GetTileType());
             }
         }
@@ -248,7 +249,7 @@ public class Grid
             return !tile.activeSelf;
         }
 
-        int [,] dropDepths = CalculateDropDepths(CheckIsNotActive, mGrid);
+        int[,] dropDepths = CalculateDropDepths(CheckIsNotActive, mGrid);
 
         for (int j = 0; j < GameConfig.Cols; j++)
         {
@@ -313,7 +314,7 @@ public class Grid
         }
 
         int[,] dropDepths = CalculateDropDepths(CheckIsNull, mGrid);
-        
+
         List<GameObject> createdTiles = new List<GameObject>();
 
         for (int i = 0; i < GameConfig.Rows; i++)
@@ -384,6 +385,34 @@ public class Grid
             mGrid[row2, col2] = temp;
 
             Debug.Log($"Switched ({row1},{col1}) with ({row2},{col2})");
+
+            // Both are color remover
+            if (item1.GetTileType() == Powerups.PowerupType.ColorRemover && item2.GetTileType() == Powerups.PowerupType.ColorRemover)
+            {
+                BombAllGrid();
+            }
+            // One is color remover, other is powerup
+            else if (item1.GetTileType() == Powerups.PowerupType.ColorRemover && item2.GetTileType() != Powerups.PowerupType.NoPowerup)
+            {
+                item1.SetIsMarked();
+                ReplaceColorWithPowerup(item2.GetColor(), item2.GetTileType());
+            }
+            else if (item2.GetTileType() == Powerups.PowerupType.ColorRemover && item1.GetTileType() != Powerups.PowerupType.NoPowerup)
+            {
+                item2.SetIsMarked();
+                ReplaceColorWithPowerup(item1.GetColor(), item1.GetTileType());
+            }
+            // Only one is color remover
+            else if (item1.GetTileType() == Powerups.PowerupType.ColorRemover)
+            {
+                item1.SetIsMarked();
+                RemoveColor(item2.GetColor());
+            }
+            else if (item2.GetTileType() == Powerups.PowerupType.ColorRemover)
+            {
+                item2.SetIsMarked();
+                RemoveColor(item1.GetColor());
+            }
         }
     }
 
@@ -444,6 +473,23 @@ public class Grid
         }
     }
 
+    public void ReplaceColorWithPowerup(Color color, Powerups.PowerupType type)
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
+            {
+                var baseTile = mGrid[i, j].GetComponent<BaseTile>();
+
+                if (baseTile.GetColor() == color)
+                {
+                    baseTile.SetTileType(type);
+                    baseTile.SetIsMarked();
+                }
+            }
+        }
+    }
+
     public void UseBomb(Vector2Int position)
     {
         int rowStart = Mathf.Max(0, position.x - (int)(GameConfig.BombAreaCoverage / 2));
@@ -458,6 +504,17 @@ public class Grid
         for (int i = rowStart; i < rowEnd; i++)
         {
             for (int j = colStart; j < colEnd; j++)
+            {
+                mGrid[i, j].GetComponent<BaseTile>().SetIsMarked();
+            }
+        }
+    }
+
+    public void BombAllGrid()
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
             {
                 mGrid[i, j].GetComponent<BaseTile>().SetIsMarked();
             }

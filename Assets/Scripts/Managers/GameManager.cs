@@ -160,6 +160,8 @@ public class GameManager : MonoBehaviour
 
             mFirstSelected = null;
             mSecondSelected = null;
+
+            yield return StartCoroutine(CallUpdateLoop());
         }
     }
 
