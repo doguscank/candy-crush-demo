@@ -177,8 +177,17 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void Destroy()
     {
+
         if (!gameObject.activeSelf)
+        {
+            // Perform power up action
+            if (mTileType != Powerups.PowerupType.NoPowerup)
+            {
+                // Power up action
+            }
+
             Object.Destroy(gameObject);
+        }
     }
 
     public void DestroyImmediate()
@@ -203,7 +212,10 @@ public class BaseTile : MonoBehaviour, ITile
         int rowIndex = -1 * (int)(mTileType);
         
         if (mTileType == Powerups.PowerupType.ColorRemover)
+        {
             columnIndex = -1;
+            mColor = TileColors.ColorRemoverColor;
+        }
         
         mSpriteRenderer.sprite = transform.GetChild(1).GetComponent<Tilemap>().GetSprite(new Vector3Int(columnIndex, rowIndex, 0));
     }

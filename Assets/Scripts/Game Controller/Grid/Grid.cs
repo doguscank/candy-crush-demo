@@ -211,7 +211,6 @@ public class Grid
                 }
             }
         }
-        
 
         Debug.Log($"isMatched: {isMatched}");
         return isMatched;

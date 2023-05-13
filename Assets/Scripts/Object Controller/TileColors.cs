@@ -15,6 +15,8 @@ public class TileColors
         Color.black
     };
 
+    public static readonly Color ColorRemoverColor = Color.white;
+
     public static Color GetRandomColor()
     {
         int index = Random.Range(0, Mathf.Min(GameConfig.MaxColorsCount, TileColors.Colors.Count));
