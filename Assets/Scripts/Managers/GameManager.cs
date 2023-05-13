@@ -174,6 +174,8 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(GameConfig.GridCheckDoneDelay);
 
         bool isValidSwitch = mGrid.CheckMatches();
+        yield return StartCoroutine(CallUpdateLoop());
+        
         if (!isValidSwitch)
         {
             // Reswitch if not valid

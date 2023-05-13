@@ -173,7 +173,7 @@ public class Grid
                 }
             }
 
-            if (noneSelected)
+            if (noneSelected && pattern.GetTileType() != Powerups.PowerupType.NoPowerup)
             {
                 int randomIndex = UnityEngine.Random.Range(0, pattern.GetLength());
                 var randomCoords = pattern.GetElement(randomIndex);
