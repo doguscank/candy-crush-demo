@@ -25,4 +25,9 @@ public class GridPattern
     {
         return mElements[idx];
     }
+
+    public int GetLength()
+    {
+        return mElements.Count;
+    }
 }

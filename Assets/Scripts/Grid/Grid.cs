@@ -49,24 +49,20 @@ public class Grid
         return copyGrid;
     }
 
-    public Color[,] GetColorGrid()
+    public GridHistoryNode[,] GetDebugGrid()
     {
-        Color[,] colorGrid = new Color[GameConfig.Rows, GameConfig.Cols];
+        GridHistoryNode[,] debugGrid = new GridHistoryNode[GameConfig.Rows, GameConfig.Cols];
 
         for (int i = 0; i < GameConfig.Rows; i++)
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                colorGrid[i, j] = mGrid[i, j].GetComponent<BaseTile>().GetColor();
+                var baseTile = mGrid[i, j].GetComponent<BaseTile>();
+                debugGrid[i, j] = new GridHistoryNode(baseTile.GetColor(), baseTile.GetTileType());
             }
         }
 
-        return colorGrid;
-    }
-
-    private bool IsInBound(int row, int col)
-    {
-        return row >= 0 && row < GameConfig.Rows && col >= 0 && col < GameConfig.Cols;
+        return debugGrid;
     }
 
     public void InitializeGrid()
@@ -129,6 +125,11 @@ public class Grid
             return mGrid[row, col].GetComponent<BaseTile>().GetColor() == color;
         }
 
+        bool IsInBound(int row, int col)
+        {
+            return row >= 0 && row < GameConfig.Rows && col >= 0 && col < GameConfig.Cols;
+        }
+
         bool IsTileMarked(int row, int col)
         {
             return mGrid[row, col].GetComponent<BaseTile>().GetMarked();
@@ -152,6 +153,8 @@ public class Grid
 
         void MarkPattern(GridPattern pattern, int row, int col)
         {
+            bool noneSelected = true;
+
             foreach (var item in pattern.GetElements())
             {
                 int newRow = row + item.Item1;
@@ -166,7 +169,20 @@ public class Grid
                 else if (newTile.GetIsSelected())
                 {
                     newTile.SetTileType(pattern.GetTileType());
+                    noneSelected = false;
                 }
+            }
+
+            if (noneSelected)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, pattern.GetLength());
+                var randomCoords = pattern.GetElement(randomIndex);
+
+                int newRow = row + randomCoords.Item1;
+                var newCol = col + randomCoords.Item2;
+
+                BaseTile newTile = mGrid[newRow, newCol].GetComponent<BaseTile>();
+                newTile.SetTileType(pattern.GetTileType());
             }
         }
 
@@ -382,13 +398,16 @@ public class Grid
         }
     }
 
-    public void RenderColorGrid(Color[,] colorGrid)
+    public void RenderDebugGrid(GridHistoryNode[,] debugGrid)
     {
         for (int i = 0; i < GameConfig.Rows; i++)
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                mGrid[i, j].GetComponent<BaseTile>().SetColor(colorGrid[i, j]);
+                var debugGridNode = debugGrid[i, j];
+                var baseTile = mGrid[i, j].GetComponent<BaseTile>();
+                baseTile.SetColor(debugGridNode.GetColor());
+                baseTile.SetTileType(debugGridNode.GetTileType());
             }
         }
     }
@@ -403,7 +422,7 @@ public class Grid
 
     public void RemoveRow(int row)
     {
-        for (int j = 0; j < GameConfig.Rows; j++)
+        for (int j = 0; j < GameConfig.Cols; j++)
         {
             mGrid[row, j].GetComponent<BaseTile>().SetIsMarked();
         }
@@ -415,9 +434,11 @@ public class Grid
         {
             for (int j = 0; j < GameConfig.Cols; j++)
             {
-                if (mGrid[i, j].GetComponent<BaseTile>().GetColor() == color)
+                var baseTile = mGrid[i, j].GetComponent<BaseTile>();
+
+                if (baseTile.GetColor() == color)
                 {
-                    mGrid[i, j].GetComponent<BaseTile>().SetIsMarked();
+                    baseTile.SetIsMarked();
                 }
             }
         }
@@ -425,11 +446,14 @@ public class Grid
 
     public void UseBomb(Vector2Int position)
     {
-        int rowStart = position.x - (int)(GameConfig.BombAreaCoverage / 2);
+        int rowStart = Mathf.Max(0, position.x - (int)(GameConfig.BombAreaCoverage / 2));
         int rowEnd = Mathf.Min(rowStart + GameConfig.BombAreaCoverage, GameConfig.Rows);
 
-        int colStart = position.y - (int)(GameConfig.BombAreaCoverage / 2);
+        int colStart = Mathf.Max(0, position.y - (int)(GameConfig.BombAreaCoverage / 2));
         int colEnd = Mathf.Min(colStart + GameConfig.BombAreaCoverage, GameConfig.Cols);
+
+        Debug.Log($"Bomb used at ({position.x},{position.y}).");
+        Debug.Log($"Bomb removed tiles from ({rowStart},{colStart}) to ({rowEnd},{colEnd})");
 
         for (int i = rowStart; i < rowEnd; i++)
         {

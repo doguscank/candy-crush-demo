@@ -205,4 +205,9 @@ public class GridPatterns : IEnumerable<GridPattern>
     {
         return GetEnumerator();
     }
+
+    public int GetLength()
+    {
+        return mPatterns.Count;
+    }
 }

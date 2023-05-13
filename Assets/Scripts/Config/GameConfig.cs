@@ -7,7 +7,7 @@ public class GameConfig
     public static readonly int MaxSequenceLength = 5;
     public static readonly float TileSpacing = 0.6f;
     public static readonly int MaxColorsCount = 3;
-    public static readonly int BombAreaCoverage = 5;
+    public static readonly int BombAreaCoverage = 3;
     // Time variables
     public static readonly float AnimationDuration = 0.33f;
     public static readonly float GridCheckDelay = 0.033f;

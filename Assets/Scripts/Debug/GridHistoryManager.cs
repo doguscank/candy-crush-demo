@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GridHistoryManager
 {
-    private LinkedList<Color[,]> mHistory = new LinkedList<Color[,]>();
+    private LinkedList<GridHistoryNode[,]> mHistory = new LinkedList<GridHistoryNode[,]>();
     private int mCursorIndex = 0;
 
     public GridHistoryManager()
@@ -12,7 +11,7 @@ public class GridHistoryManager
 
     }
 
-    public void AddGrid(Color[,] newGrid)
+    public void AddGrid(GridHistoryNode[,] newGrid)
     {
         if (mHistory.Count > GameConfig.HistorySize)
             mHistory.RemoveFirst();
@@ -21,7 +20,7 @@ public class GridHistoryManager
         mCursorIndex = mHistory.Count - 1;
     }
 
-    public Color[,] GetLastGrid()
+    public GridHistoryNode[,] GetLastGrid()
     {
         return mHistory.Last.Value;
     }
@@ -31,7 +30,7 @@ public class GridHistoryManager
         mHistory.RemoveLast();
     }
 
-    public Color[,] GetGridAtCursor()
+    public GridHistoryNode[,] GetGridAtCursor()
     {
         var cursor = mHistory.First;
 

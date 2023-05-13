@@ -157,13 +157,16 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void SetIsMarked(bool isMarked = true)
     {
-        mIsMarked = isMarked;
-
         // Perform power up action
-        if (mTileType != Powerups.PowerupType.NoPowerup)
+        if (mTileType != Powerups.PowerupType.NoPowerup && !mIsMarked)
         {
+            mIsMarked = isMarked;
+            
             // Power up action
+            PerformPowerup();
         }
+
+        mIsMarked = isMarked;
 
         if (GameConfig.IsDebug)
             mHighlight.SetActive(isMarked);

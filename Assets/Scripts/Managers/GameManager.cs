@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
             mGrid.FillEmptyGridInitial();
             mGrid.AnimateDrops(isAnimated: false);
         }
+
+        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
     }
 
     void Update()
@@ -72,13 +74,13 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             mHistoryManager.DecreaseCursorIndex();
-            mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
+            mGrid.RenderDebugGrid(mHistoryManager.GetGridAtCursor());
         }
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             mHistoryManager.IncreaseCursorIndex();
-            mGrid.RenderColorGrid(mHistoryManager.GetGridAtCursor());
+            mGrid.RenderDebugGrid(mHistoryManager.GetGridAtCursor());
         }
 
         if (Input.GetKeyDown(KeyCode.U))
@@ -106,13 +108,13 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator CallUpdateLoop()
     {
-        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
+        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
         mGrid.DestroyMatches();
         int removedTiles = mGrid.UpdateGrid();
         mScoreManager.IncreaseScore(removedTiles * 10);
         mGrid.AnimateDrops();
         mGrid.FillEmptyGrids();
-        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetColorGrid()); }
+        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
         yield return StartCoroutine(WaitForAnimations());
         mGrid.ClearSelected();
     }
