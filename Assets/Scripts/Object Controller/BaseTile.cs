@@ -11,6 +11,9 @@ public class BaseTile : MonoBehaviour, ITile
 
     [SerializeField] protected Vector2Int mCoords;
 
+    [SerializeField] protected GameObject mGameController;
+    [SerializeField] protected Grid mGrid;
+
     protected SpriteRenderer mSpriteRenderer;
     protected GameObject mHighlight;
     protected Color mColor;
@@ -23,6 +26,9 @@ public class BaseTile : MonoBehaviour, ITile
     {
         mIsMarked = false;
         mIsSelected = false;
+
+        mGameController = GameObject.FindGameObjectWithTag("GameController");
+        mGrid = mGameController.GetComponent<GameManager>().GetGrid();
 
         mSpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         mSpriteRenderer.color = Color.white;
@@ -137,11 +143,6 @@ public class BaseTile : MonoBehaviour, ITile
         SetPosition(endPosition);
     }
 
-    public void ActivateEffect()
-    {
-
-    }
-
     public void SetTileType(Powerups.PowerupType type)
     {
         Debug.Log($"Updated type of tile at ({GetCoords().x},{GetCoords().y}) to {type}");
@@ -158,8 +159,35 @@ public class BaseTile : MonoBehaviour, ITile
     {
         mIsMarked = isMarked;
 
+        // Perform power up action
+        if (mTileType != Powerups.PowerupType.NoPowerup)
+        {
+            // Power up action
+        }
+
         if (GameConfig.IsDebug)
             mHighlight.SetActive(isMarked);
+    }
+
+    public void PerformPowerup()
+    {
+        switch (mTileType)
+        {
+            case Powerups.PowerupType.ColorRemover:
+                mGrid.RemoveColor(mColor);
+                break;
+            case Powerups.PowerupType.Bomb:
+                mGrid.UseBomb(mCoords);
+                break;
+            case Powerups.PowerupType.RowRemover:
+                mGrid.RemoveRow(mCoords.x);
+                break;
+            case Powerups.PowerupType.ColumnRemover:
+                mGrid.RemoveColumn(mCoords.y);
+                break;
+            case Powerups.PowerupType.NoPowerup:
+                break;
+        }
     }
 
     public bool GetMarked()
@@ -180,12 +208,6 @@ public class BaseTile : MonoBehaviour, ITile
 
         if (!gameObject.activeSelf)
         {
-            // Perform power up action
-            if (mTileType != Powerups.PowerupType.NoPowerup)
-            {
-                // Power up action
-            }
-
             Object.Destroy(gameObject);
         }
     }

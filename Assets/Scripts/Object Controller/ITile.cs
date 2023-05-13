@@ -5,7 +5,6 @@ public interface ITile
     public void UpdateAnimation(string clipName, Vector3 targetPosition);
     public void AnimateDrop(bool isAnimated = true);
     public void AnimateSwap(Vector3 endPosition);
-    public abstract void ActivateEffect();
     public void SetTileType(Powerups.PowerupType type);
     public Powerups.PowerupType GetTileType();
     public void SetIsMarked(bool isMarked = true);

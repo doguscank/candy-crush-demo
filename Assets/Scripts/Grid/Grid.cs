@@ -64,6 +64,11 @@ public class Grid
         return colorGrid;
     }
 
+    private bool IsInBound(int row, int col)
+    {
+        return row >= 0 && row < GameConfig.Rows && col >= 0 && col < GameConfig.Cols;
+    }
+
     public void InitializeGrid()
     {
         for (int i = 0; i < GameConfig.Rows; i++)
@@ -119,11 +124,6 @@ public class Grid
 
         bool isMatched = false;
 
-        bool IsInBound(int row, int col)
-        {
-            return row >= 0 && row < GameConfig.Rows && col >= 0 && col < GameConfig.Cols;
-        }
-
         bool IsColorMatched(Color color, int row, int col)
         {
             return mGrid[row, col].GetComponent<BaseTile>().GetColor() == color;
@@ -169,28 +169,6 @@ public class Grid
                 }
             }
         }
-
-        // This algorithm tries to match a pattern for a single tile
-        // Therefore, pattern significance is not true for this algo
-        // for (int i = 0; i < GameConfig.Rows; i++)
-        // {
-        //     for (int j = 0; j < GameConfig.Cols; j++)
-        //     {
-        //         BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
-        //         Color currentColor = tile.GetColor();
-
-        //         // Get each pattern
-        //         foreach (var pattern in mGridPatterns)
-        //         {
-        //             if (IsPatternMatched(pattern, currentColor, i, j))
-        //             {
-        //                 MarkPattern(pattern, i, j);
-        //                 Debug.Log($"Match found with pattern {pattern.GetTileType()}. Tile is selected: {tile.GetIsSelected()}");
-        //                 isMatched = true;
-        //             }
-        //         }
-        //     }
-        // }
 
         // This algorithm tries to match pattern on the whole grid
         foreach (var pattern in mGridPatterns)
@@ -411,6 +389,53 @@ public class Grid
             for (int j = 0; j < GameConfig.Cols; j++)
             {
                 mGrid[i, j].GetComponent<BaseTile>().SetColor(colorGrid[i, j]);
+            }
+        }
+    }
+
+    public void RemoveColumn(int col)
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            mGrid[i, col].GetComponent<BaseTile>().SetIsMarked();
+        }
+    }
+
+    public void RemoveRow(int row)
+    {
+        for (int j = 0; j < GameConfig.Rows; j++)
+        {
+            mGrid[row, j].GetComponent<BaseTile>().SetIsMarked();
+        }
+    }
+
+    public void RemoveColor(Color color)
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
+            {
+                if (mGrid[i, j].GetComponent<BaseTile>().GetColor() == color)
+                {
+                    mGrid[i, j].GetComponent<BaseTile>().SetIsMarked();
+                }
+            }
+        }
+    }
+
+    public void UseBomb(Vector2Int position)
+    {
+        int rowStart = position.x - (int)(GameConfig.BombAreaCoverage / 2);
+        int rowEnd = Mathf.Min(rowStart + GameConfig.BombAreaCoverage, GameConfig.Rows);
+
+        int colStart = position.y - (int)(GameConfig.BombAreaCoverage / 2);
+        int colEnd = Mathf.Min(colStart + GameConfig.BombAreaCoverage, GameConfig.Cols);
+
+        for (int i = rowStart; i < rowEnd; i++)
+        {
+            for (int j = colStart; j < colEnd; j++)
+            {
+                mGrid[i, j].GetComponent<BaseTile>().SetIsMarked();
             }
         }
     }

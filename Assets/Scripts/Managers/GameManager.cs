@@ -174,6 +174,7 @@ public class GameManager : MonoBehaviour
         {
             // Reswitch if not valid
             mGrid.SwitchTiles(secondCoords.x, secondCoords.y, firstCoords.x, firstCoords.y);
+            mGrid.ClearSelected();
 
             yield return StartCoroutine(WaitForAnimations());
         }
@@ -193,5 +194,10 @@ public class GameManager : MonoBehaviour
         }
 
         Debug.Log("Animation check finished.");
+    }
+
+    public Grid GetGrid()
+    {
+        return mGrid;
     }
 }
