@@ -3,8 +3,14 @@ using UnityEngine;
 public interface ITile
 {
     public void UpdateAnimation(string clipName, Vector3 targetPosition);
+    public void UpdateAnimation(string clipName, Vector3 targetPosition, Vector3 targetScale);
+    public void UpdateAnimation(string clipName, Quaternion targetRotation);
+    public void UpdateAnimation(string clipName, Vector3 targetPosition, Quaternion targetRotation);
+    public void UpdateAnimation(string clipName, Quaternion targetRotation, Vector3 targetScale);
+    public void UpdateAnimation(string clipName, Vector3 targetPosition, Quaternion targetRotation, Vector3 targetScale);
     public void AnimateDrop(bool isAnimated = true);
     public void AnimateSwap(Vector3 endPosition);
+    public void AnimateDestroy();
     public void SetTileType(Powerups.PowerupType type);
     public Powerups.PowerupType GetTileType();
     public void SetIsMarked(bool isMarked = true);
