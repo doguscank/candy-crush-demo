@@ -16,7 +16,7 @@ public class BaseTile : MonoBehaviour, ITile
 
     protected SpriteRenderer mSpriteRenderer;
     protected GameObject mHighlight;
-    protected Color mColor;
+    [SerializeField] protected Color mColor;
 
     protected TextMeshPro mDebugText;
 

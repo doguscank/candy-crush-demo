@@ -10,7 +10,7 @@ public class DebugManager : MonoBehaviour
     private GridHistoryManager mHistoryManager;
     private Grid mGrid;
 
-    public DebugManager(Grid grid)
+    public void Initialize(Grid grid)
     {
         if (GameConfig.RandomSeed != -1)
             Random.InitState(GameConfig.RandomSeed);
@@ -66,7 +66,7 @@ public class DebugManager : MonoBehaviour
         for (int i = 0; i < randomCoords.Count; i++)
         {
             var coord = randomCoords[i];
-            grid[coord.x, coord.y].GetComponent<BaseTile>().SetTileType((Powerups.PowerupType)(1 + i / 2));
+            grid[coord.x, coord.y].GetComponent<BaseTile>().SetTileType((Powerups.PowerupType)(1 + i / GameConfig.NumberOfRandomPowerups));
         }
     }
 }

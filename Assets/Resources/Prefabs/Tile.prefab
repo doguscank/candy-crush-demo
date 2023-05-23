@@ -754,8 +754,10 @@ MonoBehaviour:
   mIsMarked: 0
   mIsSelected: 0
   mDropDepth: 0
-  mType: 0
+  mTileType: 0
   mCoords: {x: 0, y: 0}
+  mGameController: {fileID: 0}
+  mColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!111 &5827605167474554171
 Animation:
   m_ObjectHideFlags: 0

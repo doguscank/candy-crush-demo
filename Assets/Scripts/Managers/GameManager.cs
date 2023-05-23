@@ -44,7 +44,8 @@ public class GameManager : MonoBehaviour
 
         if (GameConfig.IsDebug)
         {
-            mDebugManager = new DebugManager(mGrid);
+            mDebugManager = gameObject.AddComponent<DebugManager>();
+            mDebugManager.Initialize(mGrid);
         }
     }
 
@@ -62,7 +63,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator UpdateGame()
     {
         mIsUpdating = true;
-        
+
         yield return StartCoroutine(WaitForAnimations());
 
         while (mGrid.CheckMatches())
@@ -147,7 +148,7 @@ public class GameManager : MonoBehaviour
 
         bool isValidSwitch = mGrid.CheckMatches();
         yield return StartCoroutine(CallUpdateLoop());
-        
+
         if (!isValidSwitch)
         {
             // Reswitch if not valid

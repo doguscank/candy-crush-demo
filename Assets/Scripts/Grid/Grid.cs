@@ -97,6 +97,18 @@ public class Grid
 
         bool isMatched = false;
 
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
+            {
+                BaseTile tile = mGrid[i, j].GetComponent<BaseTile>();
+                if (tile.GetIsSelected() && tile.GetTileType() == Powerups.PowerupType.ColorRemover)
+                {
+                    isMatched = true;
+                }
+            }
+        }
+
         bool IsColorMatched(Color color, int row, int col)
         {
             return mGrid[row, col].GetComponent<BaseTile>().GetColor() == color;
