@@ -25,6 +25,11 @@ public class DebugManager : MonoBehaviour
     void Start()
     {
         mHistoryManager.AddGrid(mGrid.GetDebugGrid());
+
+        if (GameConfig.SpawnRandomPowerups)
+        {
+            SpawnRandomPowerups();
+        }
     }
 
     void Update()
@@ -50,5 +55,18 @@ public class DebugManager : MonoBehaviour
     public void AddGridHistory(GridHistoryNode[,] newGrid)
     {
         mHistoryManager.AddGrid(newGrid);
+    }
+
+    private void SpawnRandomPowerups()
+    {
+        int numberOfVectors = GameConfig.NumberOfRandomPowerups * 4; // 4 is number of powerups
+        var grid = mGrid.GetGrid();
+        var randomCoords = MathUtils.GenerateRandomVectors(numberOfVectors);
+
+        for (int i = 0; i < randomCoords.Count; i++)
+        {
+            var coord = randomCoords[i];
+            grid[coord.x, coord.y].GetComponent<BaseTile>().SetTileType((Powerups.PowerupType)(1 + i / 2));
+        }
     }
 }

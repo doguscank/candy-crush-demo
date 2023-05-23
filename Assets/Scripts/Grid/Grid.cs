@@ -23,30 +23,7 @@ public class Grid
 
     public GameObject[,] GetGrid()
     {
-        // UNUSED
-
-        // Create a new array with the same dimensions as the original
-        GameObject[,] copyGrid = new GameObject[GameConfig.Rows, GameConfig.Cols];
-
-        // Copy each element of the original array to the new array
-        for (int i = 0; i < GameConfig.Rows; i++)
-        {
-            for (int j = 0; j < GameConfig.Cols; j++)
-            {
-                GameObject originalGameObject = mGrid[i, j];
-                if (originalGameObject != null)
-                {
-                    // Create a new GameObject instance with the same properties as the original
-                    GameObject copyGameObject = GameObject.Instantiate(originalGameObject);
-                    copyGameObject.SetActive(false);
-
-                    // Set the copied GameObject to the copied array
-                    copyGrid[i, j] = copyGameObject;
-                }
-            }
-        }
-
-        return copyGrid;
+        return mGrid;
     }
 
     public GridHistoryNode[,] GetDebugGrid()

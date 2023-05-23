@@ -22,11 +22,6 @@ public class GameManager : MonoBehaviour
     {
         mScoreText = mScoreObject.GetComponent<TMP_Text>();
 
-        if (GameConfig.IsDebug)
-        {
-            mDebugManager = new DebugManager(mGrid);
-        }
-
         mGrid = new Grid();
         mGrid.InitializeGrid();
 
@@ -45,6 +40,11 @@ public class GameManager : MonoBehaviour
             mGrid.UpdateGrid();
             mGrid.FillEmptyGridInitial();
             mGrid.AnimateDrops(isAnimated: false);
+        }
+
+        if (GameConfig.IsDebug)
+        {
+            mDebugManager = new DebugManager(mGrid);
         }
     }
 

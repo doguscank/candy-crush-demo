@@ -38,7 +38,7 @@ public class BaseTile : MonoBehaviour, ITile
         mDropDepth = 0;
         mTileType = Powerups.PowerupType.NoPowerup;
 
-        if (GameConfig.IsDebug)
+        if (GameConfig.IsDebug && GameConfig.ShowDebugText)
         {
             CreateDebugText();
         }
@@ -350,7 +350,7 @@ public class BaseTile : MonoBehaviour, ITile
     {
         mCoords = newCoords;
 
-        if (GameConfig.IsDebug)
+        if (GameConfig.IsDebug && GameConfig.ShowDebugText)
         {
             mDebugText.text = $"{newCoords.x},{newCoords.y}";
         }

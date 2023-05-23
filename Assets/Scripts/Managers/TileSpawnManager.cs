@@ -3,8 +3,7 @@ using UnityEngine;
 public class TileSpawnManager : MonoBehaviour
 {
     private static TileSpawnManager mInstance;
-
-    [SerializeField] private GameObject mPrefab;
+    private GameObject mPrefab;
 
     public static TileSpawnManager Instance
     {
@@ -12,35 +11,45 @@ public class TileSpawnManager : MonoBehaviour
         {
             if (mInstance == null)
             {
-                Debug.LogError("TileSpawnManager instance is null. Please ensure an object with the TileSpawnManager component is in your scene.");
+                // Try to find the instance in the scene first.
+                mInstance = FindObjectOfType<TileSpawnManager>();
+
+                if (mInstance == null)
+                {
+                    // Create new instance if one doesn't exist in the scene
+                    GameObject obj = new GameObject();
+                    obj.hideFlags = HideFlags.HideAndDontSave;
+                    mInstance = obj.AddComponent<TileSpawnManager>();
+                }
+
+                // Load the prefab when the instance is created or accessed
+                mInstance.mPrefab = Resources.Load<GameObject>("Prefabs/Tile");
             }
             return mInstance;
         }
     }
 
-    private void Awake()
+    void Awake()
     {
-        mPrefab = Resources.Load<GameObject>("Prefabs/Tile");
-
-        // Check if an instance already exists
-        if (mInstance != null && mInstance != this)
+        // Make sure there is only one instance of this class.
+        if (mInstance == null)
         {
-            // Destroy the duplicate instance
+            mInstance = this;
+        }
+        else if (mInstance != this)
+        {
             Destroy(gameObject);
             Debug.LogWarning("Duplicate TileSpawnManager instance detected. The new instance has been destroyed.");
         }
-        else
-        {
-            // Assign the current object as the instance
-            mInstance = this;
-        }
+
+        mPrefab = Resources.Load<GameObject>("Prefabs/Tile");
+        DontDestroyOnLoad(this.gameObject); // This ensures that the singleton won't be destroyed when changing scenes
     }
 
     public GameObject SpawnTile(Powerups.PowerupType type)
     {
         GameObject newTile = GameObject.Instantiate(mPrefab);
         newTile.GetComponent<BaseTile>().SetTileType(type);
-
         return newTile;
     }
 
@@ -48,7 +57,6 @@ public class TileSpawnManager : MonoBehaviour
     {
         GameObject newTile = SpawnTile(type);
         newTile.GetComponent<BaseTile>().SetColor(color);
-
         return newTile;
     }
 }

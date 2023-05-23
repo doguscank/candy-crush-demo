@@ -13,8 +13,10 @@ public class GameConfig
     public static readonly float GridCheckDelay = 0.033f;
     public static readonly float GridCheckDoneDelay = 0.033f;
     // Debug options
-    public static readonly bool IsDebug = false;
+    public static readonly bool IsDebug = true;
+    public static readonly bool ShowDebugText = false;
     public static readonly int HistorySize = 100;
-    public static readonly int RandomSeed = 42;
-    public static readonly bool SpawnRandomPowerups = false;
+    public static readonly int RandomSeed = -1;
+    public static readonly bool SpawnRandomPowerups = true;
+    public static readonly int NumberOfRandomPowerups = 2;
 }
