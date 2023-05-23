@@ -6,8 +6,8 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     private Grid mGrid;
-    private GridHistoryManager mHistoryManager;
     private ScoreManager mScoreManager;
+    private DebugManager mDebugManager;
 
     [SerializeField] private bool mIsUpdating = false;
     [SerializeField] private bool mIsClicked = false;
@@ -24,10 +24,7 @@ public class GameManager : MonoBehaviour
 
         if (GameConfig.IsDebug)
         {
-            if (GameConfig.RandomSeed != -1)
-                Random.InitState(GameConfig.RandomSeed);
-
-            mHistoryManager = new GridHistoryManager();
+            mDebugManager = new DebugManager(mGrid);
         }
 
         mGrid = new Grid();
@@ -49,8 +46,6 @@ public class GameManager : MonoBehaviour
             mGrid.FillEmptyGridInitial();
             mGrid.AnimateDrops(isAnimated: false);
         }
-
-        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
     }
 
     void Update()
@@ -62,34 +57,9 @@ public class GameManager : MonoBehaviour
         // Don't update game in debug mode
         if (!mIsUpdating && mIsClicked)
         { StartCoroutine(UpdateGame()); }
-
-        if (GameConfig.IsDebug)
-        {
-            CheckDebugKeys();
-        }
     }
 
-    private void CheckDebugKeys()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            mHistoryManager.DecreaseCursorIndex();
-            mGrid.RenderDebugGrid(mHistoryManager.GetGridAtCursor());
-        }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            mHistoryManager.IncreaseCursorIndex();
-            mGrid.RenderDebugGrid(mHistoryManager.GetGridAtCursor());
-        }
-
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            StartCoroutine(UpdateGame());
-        }
-    }
-
-    private IEnumerator UpdateGame()
+    public IEnumerator UpdateGame()
     {
         mIsUpdating = true;
         
@@ -108,7 +78,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator CallUpdateLoop()
     {
-        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
+        if (GameConfig.IsDebug) { mDebugManager.AddGridHistory(mGrid.GetDebugGrid()); }
         mGrid.AnimateDestroys();
         yield return StartCoroutine(WaitForAnimations());
         mGrid.DestroyMatches();
@@ -116,7 +86,7 @@ public class GameManager : MonoBehaviour
         mScoreManager.IncreaseScore(removedTiles * 10);
         mGrid.AnimateDrops();
         mGrid.FillEmptyGrids();
-        if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
+        if (GameConfig.IsDebug) { mDebugManager.AddGridHistory(mGrid.GetDebugGrid()); }
         yield return StartCoroutine(WaitForAnimations());
         mGrid.ClearSelected();
     }
