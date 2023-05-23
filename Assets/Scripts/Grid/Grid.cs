@@ -348,6 +348,21 @@ public class Grid
         }
     }
 
+    public void AnimateDestroys()
+    {
+        for (int i = 0; i < GameConfig.Rows; i++)
+        {
+            for (int j = 0; j < GameConfig.Cols; j++)
+            {
+                var baseTile = mGrid[i, j].GetComponent<BaseTile>();
+                if (baseTile.GetMarked())
+                {
+                    baseTile.AnimateDestroy();
+                }
+            }
+        }
+    }
+
     public bool CheckAnimations()
     {
         for (int i = 0; i < GameConfig.Rows; i++)

@@ -109,6 +109,8 @@ public class GameManager : MonoBehaviour
     private IEnumerator CallUpdateLoop()
     {
         if (GameConfig.IsDebug) { mHistoryManager.AddGrid(mGrid.GetDebugGrid()); }
+        mGrid.AnimateDestroys();
+        yield return StartCoroutine(WaitForAnimations());
         mGrid.DestroyMatches();
         int removedTiles = mGrid.UpdateGrid();
         mScoreManager.IncreaseScore(removedTiles * 10);

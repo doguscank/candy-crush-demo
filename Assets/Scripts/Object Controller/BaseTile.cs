@@ -210,7 +210,8 @@ public class BaseTile : MonoBehaviour, ITile
 
     public void AnimateDestroy()
     {
-
+        UpdateAnimation("DestroyTile", Quaternion.Euler(0f, 0f, 359.9f), new Vector3(0.1f, 0.1f, 1f));
+        mAnimation.Play("DestroyTile");
     }
 
     public void SetTileType(Powerups.PowerupType type)
